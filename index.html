@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Portfolio</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,25 +13,31 @@
             background: #f4f4f4;
             color: #333;
         }
+
         header {
             text-align: center;
             padding: 40px 20px;
             background: #222;
             color: #fff;
         }
-        h1 {
-            margin: 0;
-        }
+
         section {
             max-width: 1000px;
             margin: 40px auto;
             padding: 0 20px;
         }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
         .projects {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
         }
+
         .project {
             background: #fff;
             padding: 20px;
@@ -38,24 +45,23 @@
             border-radius: 8px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
-        .project button {
-            margin-top: 10px;
-            padding: 10px 15px;
-            background: #222;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
+
+        video {
+            margin-top: 15px;
+            border-radius: 6px;
         }
+
         .contacts {
             text-align: center;
         }
+
         .contacts a {
             margin: 0 10px;
             text-decoration: none;
             color: #222;
         }
-        @media(max-width: 700px){
+
+        @media (max-width: 700px) {
             .projects {
                 flex-direction: column;
             }
@@ -64,42 +70,48 @@
 </head>
 <body>
 
-<section class="projects">
+<header>
+    <h1>Моё портфолио</h1>
+    <p>Проекты на Scratch</p>
+</header>
+
+<section>
     <h2>Мои проекты</h2>
-   <<div class="project">
-    <h3>Проект 1</h3>
-    <p>Описание проекта 1. Коротко о том, что это за проект авто с 6 скоростями.</p>
-    <video width="100%" controls>
-        <source src="videos/ml4k-recording%20_2.webm
-        " type="video/webm" 
-     </video> 
-</div>
 
+    <div class="projects">
 
+        <div class="project">
+            <h3>Проект 1 — Scratch</h3>
+            <p>Игра/проект в Scratch. Видео записи работы проекта.</p>
+
+            <video width="100%" controls>
+                <source src="videos/scratch_project1.mp4" type="video/mp4">
+                Ваш браузер не поддерживает видео.
+            </video>
+        </div>
 
         <div class="project">
             <h3>Проект 2</h3>
-            <p>Описание проекта 2. Коротко о том, что это за проект.</p>
-            <button>Посмотреть</button>
+            <p>Описание второго проекта.</p>
         </div>
+
         <div class="project">
             <h3>Проект 3</h3>
-            <p>Описание проекта 3. Коротко о том, что это за проект.</p>
-            <button>Посмотреть</button>
+            <p>Описание третьего проекта.</p>
         </div>
+
     </div>
 </section>
-<section id="contact">
-  <h2>Контакты</h2>
-  <ul>
-    <li>Телефон: <a href="tel:+996500502204">+996 500 502 204</a></li>
-    <li>Telegram: <a href="https://t.me/Reason65">@Reason65</a></li>
-    <li>Email: <a href="mailto:alitojcubekov206@gmail.com">alitojcubekov206@gmail.com</a></li>
-  </ul>
+
+<section class="contacts">
+    <h2>Контакты</h2>
+    <p>
+        📞 <a href="tel:+996500502204">+996 500 502 204</a><br>
+        💬 <a href="https://t.me/Reason65">Telegram</a><br>
+        ✉️ <a href="mailto:alitojcubekov206@gmail.com">alitojcubekov206@gmail.com</a>
+    </p>
 </section>
-
-
-    
 
 </body>
 </html>
+
