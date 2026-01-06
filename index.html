@@ -21,6 +21,11 @@
             color: #fff;
         }
 
+        header p {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+
         section {
             max-width: 1000px;
             margin: 40px auto;
@@ -73,6 +78,7 @@
 
 <header>
     <h1>Моё портфолио</h1>
+    <p><strong>Али Тойчубеков</strong> — частный таалим (школа), 8 класс</p>
     <p>Проекты на Scratch</p>
 </header>
 
@@ -84,21 +90,19 @@
         <div class="project">
             <h3>Проект 1 — Scratch</h3>
             <p>Видео записи работы проекта в Scratch.</p>
-
-            <!-- Исправленный путь к видео через GitHub Pages -->
-         <video controls muted preload="metadata">
-    <source src="./scratch1.mp4" type="video/mp4">
-    Ваш браузер не поддерживает видео.
-</video>
-
+            <video controls muted preload="metadata">
+                <source src="./scratch1.mp4" type="video/mp4">
+                Ваш браузер не поддерживает видео.
+            </video>
         </div>
-<div class="project">
-    <h3>Проект 2 — Scratch</h3>
-    <p>Видео второго проекта.</p>
-    <video controls muted preload="metadata">
-        <source src="./scratch_project2.mp4" type="video/mp4">
-    </video>
-</div>
+
+        <div class="project">
+            <h3>Проект 2 — Scratch</h3>
+            <p>Видео второго проекта.</p>
+            <video controls muted preload="metadata">
+                <source src="./scratch_project2.mp4" type="video/mp4">
+            </video>
+        </div>
 
         <div class="project">
             <h3>Проект 3</h3>
