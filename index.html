@@ -1,126 +1,134 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Portfolio</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Portfolio</title>
+  <style>
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f0f2f5;
+      color: #333;
+    }
+    a { text-decoration: none; color: inherit; }
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f4f4f4;
-            color: #333;
-        }
+    header {
+      text-align: center;
+      padding: 60px 20px;
+      background: linear-gradient(135deg, #6b73ff, #000dff);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    header h1 { margin: 0; font-size: 3em; }
+    header p { font-size: 18px; margin: 10px 0 0; opacity: 0.9; }
 
-        header {
-            text-align: center;
-            padding: 40px 20px;
-            background: #222;
-            color: #fff;
-        }
+    section { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+    h2 { text-align: center; margin-bottom: 40px; font-size: 2.5em; color: #222; }
 
-        header p {
-            font-size: 18px;
-            margin: 5px 0;
-        }
+    .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
 
-        section {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
+    .project {
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .project:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 25px rgba(0,0,0,0.15);
+    }
+    .project h3 { margin-top: 0; font-size: 1.3em; color: #000dff; }
+    .project p { font-size: 0.95em; opacity: 0.8; }
+    video { width: 100%; margin-top: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
-        h2 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+    .contacts { text-align: center; margin: 60px 0; }
+    .contacts h2 { font-size: 2em; margin-bottom: 20px; color: #000dff; }
+    .contacts p a { display: inline-block; margin: 10px 15px; font-weight: 600; color: #222; transition: color 0.3s; }
+    .contacts p a:hover { color: #000dff; }
 
-        .projects {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .project {
-            background: #fff;
-            padding: 20px;
-            flex: 1 1 300px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-
-        video {
-            width: 100%;
-            margin-top: 15px;
-            border-radius: 6px;
-        }
-
-        .contacts {
-            text-align: center;
-        }
-
-        .contacts a {
-            margin: 0 10px;
-            text-decoration: none;
-            color: #222;
-        }
-
-        @media (max-width: 700px) {
-            .projects {
-                flex-direction: column;
-            }
-        }
-    </style>
+    @media (max-width: 600px) {
+      header h1 { font-size: 2.2em; }
+      header p { font-size: 16px; }
+      h2 { font-size: 2em; }
+    }
+  </style>
 </head>
 <body>
 
 <header>
-    <h1>Моё портфолио</h1>
-    <p><strong>Али Тойчубеков</strong> — частный Таалим (школа), 8 класс</p>
-    <p>Проекты на Scratch</p>
+  <h1>Моё портфолио</h1>
+  <p><strong>Али Тойчубеков</strong> — частный Таалим (школа), 8 класс</p>
+  <p>Проекты на Scratch</p>
 </header>
 
 <section>
-    <h2>Мои проекты</h2>
+  <h2>Мои проекты</h2>
+  <div class="projects">
 
-    <div class="projects">
-
-        <div class="project">
-            <h3>Проект 1 — Scratch</h3>
-            <p>Видео записи работы проекта в Scratch.</p>
-            <video controls muted preload="metadata">
-                <source src="./scratch1.mp4" type="video/mp4">
-                Ваш браузер не поддерживает видео.
-            </video>
-        </div>
-
-        <div class="project">
-            <h3>Проект 2 — Scratch</h3>
-            <p>Видео второго проекта.</p>
-            <video controls muted preload="metadata">
-                <source src="./scratch_project2.mp4" type="video/mp4">
-            </video>
-        </div>
-
-        <div class="project">
-            <h3>Проект 3</h3>
-            <p>Описание третьего проекта.</p>
-        </div>
-
+    <!-- Проект 1 -->
+    <div class="project">
+      <h3>Проект 1 — Scratch</h3>
+      <p>Видео записи работы проекта в Scratch.</p>
+      <video controls muted preload="metadata">
+        <source src="./scratch1.mp4" type="video/mp4">
+      </video>
     </div>
+
+    <!-- Проект 2 -->
+    <div class="project">
+      <h3>Проект 2 — Scratch</h3>
+      <p>Видео записи работы проекта в Scratch.</p>
+      <video controls muted preload="metadata">
+        <source src="./scratch_project2.mp4" type="video/mp4">
+      </video>
+    </div>
+
+    <!-- Проект 3 -->
+    <div class="project">
+      <h3>Проект 3 — Scratch</h3>
+      <p>Видео записи работы проекта в Scratch.</p>
+      <video controls muted preload="metadata">
+        <source src="./scratch_project3.mp4" type="video/mp4">
+      </video>
+    </div>
+
+    <!-- Проекты 4–24 -->
+    <div class="project"><h3>Проект 4 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 5 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 6 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 7 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 8 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 9 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 10 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 11 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 12 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 13 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 14 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 15 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 16 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 17 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 18 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 19 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 20 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 21 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 22 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 23 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <div class="project"><h3>Проект 24 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+
+  </div>
 </section>
 
 <section class="contacts">
-    <h2>Контакты</h2>
-    <p>
-        📞 <a href="tel:+996500502204">+996 500 502 204</a><br>
-        💬 <a href="https://t.me/Reason65">Telegram</a><br>
-        ✉️ <a href="mailto:alitojcubekov206@gmail.com">alitojcubekov206@gmail.com</a>
-    </p>
+  <h2>Контакты</h2>
+  <p>
+    📞 <a href="tel:+996500502204">+996 500 502 204</a><br>
+    💬 <a href="https://t.me/Reason65">Telegram</a><br>
+    ✉️ <a href="mailto:alitojcubekov206@gmail.com">alitojcubekov206@gmail.com</a>
+  </p>
 </section>
 
 </body>
 </html>
-
