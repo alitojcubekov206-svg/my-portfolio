@@ -5,48 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Моё портфолио</title>
 
-<!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-  /* Основные стили */
   body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
-    background: #111; /* темный фон */
+    background: #111;
     color: #fff;
   }
 
   a { text-decoration: none; color: inherit; }
 
-  /* Хедер */
   header {
     text-align: center;
     padding: 80px 20px;
     background: linear-gradient(135deg, #000, #222);
-    color: #FFD700; /* желтый */
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    position: relative;
-    overflow: hidden;
+    color: #FFD700;
   }
+
   header h1 {
     font-size: 3em;
     margin: 0 0 10px;
   }
-  header p {
-    font-size: 1.1em;
-    margin: 5px 0;
-    opacity: 0.9;
-    color: #FFD700;
-  }
 
-  /* Секция проектов */
   section {
     max-width: 1200px;
     margin: 50px auto;
     padding: 0 20px;
   }
+
   h2 {
     text-align: center;
     margin-bottom: 50px;
@@ -65,64 +54,34 @@
     border-radius: 20px;
     padding: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    transition: transform 0.3s, box-shadow 0.3s;
-    overflow: hidden;
-    position: relative;
   }
-  .project:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.7);
-  }
+
   .project h3 {
     margin-top: 0;
     font-size: 1.4em;
     color: #FFD700;
   }
+
   .project p {
     font-size: 0.95em;
     opacity: 0.8;
     margin-bottom: 15px;
   }
+
   video {
     width: 100%;
     border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    transition: transform 0.3s;
-  }
-  video:hover {
-    transform: scale(1.02);
   }
 
-  /* Секция контактов */
   .contacts {
     text-align: center;
     padding: 60px 20px;
     background: #000;
     color: #FFD700;
   }
-  .contacts h2 {
-    font-size: 2.2em;
-    margin-bottom: 25px;
-  }
-  .contacts p a {
-    display: inline-block;
-    margin: 10px 15px;
-    font-weight: 600;
-    color: #FFD700;
-    transition: color 0.3s;
-  }
-  .contacts p a:hover {
-    color: #fff;
-  }
-
-  /* Адаптив */
-  @media (max-width: 600px) {
-    header h1 { font-size: 2.2em; }
-    header p { font-size: 16px; }
-    h2 { font-size: 2em; }
-  }
 </style>
 </head>
+
 <body>
 
 <header>
@@ -133,36 +92,55 @@
 
 <section>
   <h2>Мои проекты</h2>
+
   <div class="projects">
 
-    <!-- Проекты с видео -->
+    <!-- 1 -->
     <div class="project">
       <h3>Проект 1 — Scratch</h3>
       <p>Видео записи работы проекта в Scratch.</p>
-      <video controls muted preload="metadata">
+      <video controls muted>
         <source src="./scratch1.mp4" type="video/mp4">
       </video>
     </div>
 
+    <!-- 2 -->
     <div class="project">
       <h3>Проект 2 — Scratch</h3>
       <p>Видео записи работы проекта в Scratch.</p>
-      <video controls muted preload="metadata">
+      <video controls muted>
         <source src="./scratch_project2.mp4" type="video/mp4">
       </video>
     </div>
 
+    <!-- 3 -->
     <div class="project">
       <h3>Проект 3 — Scratch</h3>
       <p>Видео записи работы проекта в Scratch.</p>
-      <video controls muted preload="metadata">
-        <source src="./scratch_project.3.mp4" type="video/mp4">
+      <video controls muted>
+        <source src="./scratch_project3.mp4" type="video/mp4">
       </video>
     </div>
 
-    <!-- Проекты 4–24 -->
-    <div class="project"><h3>Проект 4 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
-    <div class="project"><h3>Проект 5 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
+    <!-- 4 (ДОБАВЛЕНО ВИДЕО) -->
+    <div class="project">
+      <h3>Проект 4 — Scratch</h3>
+      <p>Видео записи работы проекта в Scratch.</p>
+      <video controls muted>
+        <source src="./scratch_project4.mp4" type="video/mp4">
+      </video>
+    </div>
+
+    <!-- 5 (ДОБАВЛЕНО ВИДЕО) -->
+    <div class="project">
+      <h3>Проект 5 — Scratch</h3>
+      <p>Видео записи работы проекта в Scratch.</p>
+      <video controls muted>
+        <source src="./scratch_project5.mp4" type="video/mp4">
+      </video>
+    </div>
+
+    <!-- 6–24 БЕЗ ИЗМЕНЕНИЙ -->
     <div class="project"><h3>Проект 6 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
     <div class="project"><h3>Проект 7 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
     <div class="project"><h3>Проект 8 — Scratch</h3><p>Видео записи работы проекта в Scratch.</p></div>
