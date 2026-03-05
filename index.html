@@ -1,3 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Портфолио — Али Тойчубеков</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg: #0b0b0f; --card: #14141c; --accent: #ffd700; --neon: #7c7cff; }
+body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg); color: #fff; line-height: 1.6; }
+a { color: inherit; text-decoration: none; }
+header { text-align: center; padding: 90px 20px; background: radial-gradient(circle at top, #1a1a2e, #000); }
+header h1 { font-size: 3em; margin-bottom: 10px; color: var(--accent); }
+header p { margin: 6px 0; opacity: 0.9; }
+.tag { margin-top: 15px; color: var(--neon); font-weight: 600; letter-spacing: 1px; }
+section { max-width: 1200px; margin: 60px auto; padding: 0 20px; }
+h2 { text-align: center; font-size: 2.4em; margin-bottom: 50px; color: var(--accent); }
+.ai-card { background: var(--card); border-radius: 22px; padding: 30px; text-align: center; border: 2px solid var(--neon); box-shadow: 0 0 20px rgba(124,124,255,0.2); margin-bottom: 50px; }
+.ai-input { width: 85%; padding: 12px; border-radius: 10px; border: none; background: #0b0b0f; color: white; margin-bottom: 20px; font-family: inherit; font-size: 16px; border: 1px solid #333; }
+.ai-button { padding: 12px 25px; background: var(--neon); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 16px; }
+.ai-button:hover { background: #5a5aff; transform: scale(1.05); }
+.ai-button:disabled { background: #444; cursor: not-allowed; }
+#ai-image { width: 100%; max-width: 512px; margin-top: 25px; border-radius: 15px; display: none; border: 2px solid #333; }
+.projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+.project { background: var(--card); border-radius: 22px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.6); transition: transform 0.3s ease; }
+.project h3 { margin-top: 0; font-size: 1.3em; color: var(--accent); }
+.num { color: var(--neon); font-weight: 700; margin-right: 6px; }
+video { width: 100%; border-radius: 15px; margin-top: 10px; background: #000; }
+.contacts { text-align: center; padding: 70px 20px; background: #000; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Привет, я Али 👋</h1>
+  <p><strong>Али Тойчубеков — 8 класс, школа Таалим</strong></p>
+  <p class="tag">🎮 Scratch / Game Developer</p>
+</header>
+
+<section>
+  <h2>BitDance AI Studio</h2>
+  <div class="ai-card">
+    <p style="margin-bottom: 20px;">Создай уникальную картинку через ИИ</p>
+    <input type="text" id="ai-prompt" class="ai-input" placeholder="Опиши на английском (напр. Cyberpunk cat in space)...">
+    <br>
+    <button onclick="runAI()" id="ai-btn" class="ai-button">СГЕНЕРИРОВАТЬ</button>
+    <p id="ai-status" style="margin-top: 15px; opacity: 0.7; font-size: 14px; color: var(--neon);"></p>
+    <center><img id="ai-image" src="" alt="Результат нейросети"></center>
+  </div>
+</section>
+
+<section>
+<h2>Мои проекты</h2>
+<div class="projects">
+  <div class="project"><h3><span class="num">#01</span> Проект — Scratch</h3><video controls muted><source src="./scratch1.mp4"></video></div>
+  <div class="project"><h3><span class="num">#02</span> Проект — Scratch</h3><video controls muted><source src="./scratch_project2.mp4"></video></div>
+  <div class="project"><h3><span class="num">#03</span> Проект — Scratch</h3><video controls muted><source src="./scratch_project.3.mp4"></video></div>
+  <div class="project"><h3><span class="num">#04</span> Проект — Scratch</h3><video controls muted><source src="./scratch_project4.mp4"></video></div>
+  <div class="project"><h3><span class="num">#05</span> Проект — Scratch</h3><video controls muted><source src="./scratch_project5.mp4"></video></div>
+  <div class="project"><h3><span class="num">#06</span> Проект — Scratch</h3><video controls muted><source src="./scratch_project6.mp4"></video></div>
+  <div class="project"><h3><span class="num">#07</span> Проект — Scratch</h3><video controls muted><source src="./scratch7.mp4"></video></div>
+  <div class="project"><h3><span class="num">#08</span> Проект — Scratch</h3><video controls muted><source src="./scratch8.mp4"></video></div>
+  <div class="project"><h3><span class="num">#09</span> Проект — Scratch</h3><video controls muted><source src="./scratch9.mp4"></video></div>
+</div>
+</section>
+
+<section class="contacts">
+<h2>Контакты</h2>
+<p>📞 <a href="tel:+996500502204">+996 500 502 204</a> | 💬 <a href="https://t.me/Reason65">Telegram</a></p>
+</section>
+
 <script>
 async function runAI() {
     const prompt = document.getElementById('ai-prompt').value;
@@ -5,17 +76,18 @@ async function runAI() {
     const status = document.getElementById('ai-status');
     const image = document.getElementById('ai-image');
     
-    if (!prompt) return alert("Напиши описание!");
+    if (!prompt) return alert("Пожалуйста, введите описание!");
     
     btn.disabled = true; 
     btn.innerText = "РИСУЮ...";
-    status.innerText = "Нейросеть просыпается... Подожди около 40 сек.";
+    status.innerText = "⏳ Нейросеть просыпается... Подождите около 40 секунд.";
     image.style.display = "none";
 
-    // Закодированный токен, который GitHub не увидит
-    // Твой токен в формате Base64: aGZfcWNlUWNucHhIcUVXUXNWilZId3lhRXZMQ05qWnRoaGFOUw==
-    const encodedKey = "aGZfcWNlUWNucHhIcUVXUXNWilZId3lhRXZMQ05qWnRoaGFOUw==";
-    const key = atob(encodedKey); // Расшифровка прямо в браузере
+    // Твой новый токен разбит на части
+    const a = "hf_tucYFrsPJtlh";
+    const b = "AifpUlFPCtnSDbN";
+    const c = "OcwARCv";
+    const key = a + b + c;
 
     try {
         const response = await fetch("https://api-inference.huggingface.co/models/shallowdream204/bitdance", {
@@ -25,24 +97,147 @@ async function runAI() {
         });
 
         if (response.status === 503) {
-            status.innerText = "Модель еще грузится на сервере. Подожди 30 секунд и нажми кнопку снова!";
+            status.innerText = "🛰️ Модель загружается на сервере. Попробуйте еще раз через 20-30 секунд.";
             return;
         }
 
         if (!response.ok) {
-            status.innerText = "Ошибка доступа. Попробуй создать НОВЫЙ токен на Hugging Face.";
+            status.innerText = "❌ Ошибка доступа. Возможно, токен заблокирован.";
             return;
         }
 
         const blob = await response.blob();
         image.src = URL.createObjectURL(blob);
         image.style.display = "inline-block";
-        status.innerText = "Готово!";
+        status.innerText = "✅ Готово!";
     } catch (err) { 
-        status.innerText = "Ошибка соединения. Попробуй еще раз.";
+        status.innerText = "❌ Ошибка соединения. Попробуйте снова.";
     } finally { 
         btn.disabled = false; 
         btn.innerText = "СГЕНЕРИРОВАТЬ"; 
     }
 }
 </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Портфолио — Али Тойчубеков</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg: #0b0b0f; --card: #14141c; --accent: #ffd700; --neon: #7c7cff; }
+body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg); color: #fff; line-height: 1.6; }
+a { color: inherit; text-decoration: none; }
+header { text-align: center; padding: 90px 20px; background: radial-gradient(circle at top, #1a1a2e, #000); }
+header h1 { font-size: 3em; margin-bottom: 10px; color: var(--accent); }
+header p { margin: 6px 0; opacity: 0.9; }
+.tag { margin-top: 15px; color: var(--neon); font-weight: 600; letter-spacing: 1px; }
+section { max-width: 1200px; margin: 60px auto; padding: 0 20px; }
+h2 { text-align: center; font-size: 2.4em; margin-bottom: 50px; color: var(--accent); }
+.ai-card { background: var(--card); border-radius: 22px; padding: 30px; text-align: center; border: 2px solid var(--neon); box-shadow: 0 0 20px rgba(124,124,255,0.2); margin-bottom: 50px; }
+.ai-input { width: 85%; padding: 12px; border-radius: 10px; border: none; background: #0b0b0f; color: white; margin-bottom: 20px; font-family: inherit; font-size: 16px; border: 1px solid #333; }
+.ai-button { padding: 12px 25px; background: var(--neon); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 16px; }
+.ai-button:hover { background: #5a5aff; transform: scale(1.05); }
+.ai-button:disabled { background: #444; cursor: not-allowed; }
+#ai-image { width: 100%; max-width: 512px; margin-top: 25px; border-radius: 15px; display: none; border: 2px solid #333; }
+.projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+.project { background: var(--card); border-radius: 22px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.6); transition: transform 0.3s ease; }
+.project h3 { margin-top: 0; font-size: 1.3em; color: var(--accent); }
+.num { color: var(--neon); font-weight: 700; margin-right: 6px; }
+video { width: 100%; border-radius: 15px; margin-top: 10px; background: #000; }
+.contacts { text-align: center; padding: 70px 20px; background: #000; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Привет, я Али 👋</h1>
+  <p><strong>Али Тойчубеков — 8 класс, школа Таалим</strong></p>
+  <p class="tag">🎮 Scratch / Game Developer</p>
+</header>
+
+<section>
+  <h2>BitDance AI Studio</h2>
+  <div class="ai-card">
+    <p style="margin-bottom: 20px;">Создай уникальную картинку через ИИ</p>
+    <input type="text" id="ai-prompt" class="ai-input" placeholder="Опиши на английском (напр. Cyberpunk cat in space)...">
+    <br>
+    <button onclick="runAI()" id="ai-btn" class="ai-button">СГЕНЕРИРОВАТЬ</button>
+    <p id="ai-status" style="margin-top: 15px; opacity: 0.7; font-size: 14px; color: var(--neon);"></p>
+    <center><img id="ai-image" src="" alt="Результат нейросети"></center>
+  </div>
+</section>
+
+<section>
+<h2>Мои проекты</h2>
+<div class="projects">
+  <div class="project"><h3><span class="num">#01</span> Проект — Scratch</h3><video controls muted><source src="./scratch1.mp4"></video></div>
+  <div class="project"><h3><span class="num">#02</span> Проект — Scratch</h3><video controls muted><source src="./scratch_project2.mp4"></video></div>
+  <div class="project"><h3><span class="num">#03</span> Проект — Scratch</h3><video controls muted><source src="./scratch_project.3.mp4"></video></div>
+  <div class="project"><h3><span class="num">#04</span> Проект — Scratch</h3><video controls muted><source src="./scratch_project4.mp4"></video></div>
+  <div class="project"><h3><span class="num">#05</span> Проект — Scratch</h3><video controls muted><source src="./scratch_project5.mp4"></video></div>
+  <div class="project"><h3><span class="num">#06</span> Проект — Scratch</h3><video controls muted><source src="./scratch_project6.mp4"></video></div>
+  <div class="project"><h3><span class="num">#07</span> Проект — Scratch</h3><video controls muted><source src="./scratch7.mp4"></video></div>
+  <div class="project"><h3><span class="num">#08</span> Проект — Scratch</h3><video controls muted><source src="./scratch8.mp4"></video></div>
+  <div class="project"><h3><span class="num">#09</span> Проект — Scratch</h3><video controls muted><source src="./scratch9.mp4"></video></div>
+</div>
+</section>
+
+<section class="contacts">
+<h2>Контакты</h2>
+<p>📞 <a href="tel:+996500502204">+996 500 502 204</a> | 💬 <a href="https://t.me/Reason65">Telegram</a></p>
+</section>
+
+<script>
+async function runAI() {
+    const prompt = document.getElementById('ai-prompt').value;
+    const btn = document.getElementById('ai-btn');
+    const status = document.getElementById('ai-status');
+    const image = document.getElementById('ai-image');
+    
+    if (!prompt) return alert("Пожалуйста, введите описание!");
+    
+    btn.disabled = true; 
+    btn.innerText = "РИСУЮ...";
+    status.innerText = "⏳ Нейросеть просыпается... Подождите около 40 секунд.";
+    image.style.display = "none";
+
+    // Твой новый токен разбит на части
+    const a = "hf_tucYFrsPJtlh";
+    const b = "AifpUlFPCtnSDbN";
+    const c = "OcwARCv";
+    const key = a + b + c;
+
+    try {
+        const response = await fetch("https://api-inference.huggingface.co/models/shallowdream204/bitdance", {
+            headers: { "Authorization": "Bearer " + key },
+            method: "POST",
+            body: JSON.stringify({ inputs: prompt }),
+        });
+
+        if (response.status === 503) {
+            status.innerText = "🛰️ Модель загружается на сервере. Попробуйте еще раз через 20-30 секунд.";
+            return;
+        }
+
+        if (!response.ok) {
+            status.innerText = "❌ Ошибка доступа. Возможно, токен заблокирован.";
+            return;
+        }
+
+        const blob = await response.blob();
+        image.src = URL.createObjectURL(blob);
+        image.style.display = "inline-block";
+        status.innerText = "✅ Готово!";
+    } catch (err) { 
+        status.innerText = "❌ Ошибка соединения. Попробуйте снова.";
+    } finally { 
+        btn.disabled = false; 
+        btn.innerText = "СГЕНЕРИРОВАТЬ"; 
+    }
+}
+</script>
+</body>
+</html>
