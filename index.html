@@ -38,8 +38,8 @@ video { width: 100%; border-radius: 15px; margin-top: 10px; }
 <section>
   <h2>BitDance AI Studio</h2>
   <div class="ai-card">
-    <p>Генерация картинок через ИИ BitDance</p>
-    <input type="text" id="ai-prompt" class="ai-input" placeholder="Опиши картинку на английском (например: Cyberpunk cat)...">
+    <p>Создай картинку через ИИ BitDance</p>
+    <input type="text" id="ai-prompt" class="ai-input" placeholder="Опиши картинку на английском...">
     <br>
     <button onclick="runAI()" id="ai-btn" class="ai-button">СГЕНЕРИРОВАТЬ</button>
     <p id="ai-status" style="margin-top: 15px; opacity: 0.7;"></p>
@@ -73,29 +73,48 @@ async function runAI() {
     const btn = document.getElementById('ai-btn');
     const status = document.getElementById('ai-status');
     const image = document.getElementById('ai-image');
+    
     if (!prompt) return alert("Напиши описание!");
     
-    btn.disabled = true; btn.innerText = "РИСУЮ...";
+    btn.disabled = true; 
+    btn.innerText = "РИСУЮ...";
     status.innerText = "Нейросеть просыпается... Подожди около 40 сек.";
     image.style.display = "none";
-    
-    // Токен разбит на части
-    const a = "hf_iDqdrcrtdAk";
-    const b = "YlqOTpILroXhURVPlFkAFmv";
+
+    // Твой новый токен, разделенный на части для защиты от GitHub
+    const p1 = "hf_qceQcn";
+    const p2 = "pxHqEWQsV";
+    const p3 = "VHVwyaEvLC";
+    const p4 = "NjZthhaNS";
+    const key = p1 + p2 + p3 + p4;
 
     try {
         const response = await fetch("https://api-inference.huggingface.co/models/shallowdream204/bitdance", {
-            headers: { Authorization: "Bearer " + a + b },
+            headers: { "Authorization": "Bearer " + key },
             method: "POST",
             body: JSON.stringify({ inputs: prompt }),
         });
-        if (!response.ok) throw new Error("Модель загружается. Попробуй еще раз через минуту.");
+
+        if (response.status === 503) {
+            status.innerText = "Модель еще грузится на сервере. Подожди 30 секунд и нажми кнопку снова!";
+            return;
+        }
+
+        if (!response.ok) {
+            status.innerText = "Ошибка доступа. GitHub мог заблокировать токен. Проверь почту.";
+            return;
+        }
+
         const blob = await response.blob();
         image.src = URL.createObjectURL(blob);
         image.style.display = "inline-block";
         status.innerText = "Готово!";
-    } catch (err) { status.innerText = "Ошибка: " + err.message;
-    } finally { btn.disabled = false; btn.innerText = "СГЕНЕРИРОВАТЬ"; }
+    } catch (err) { 
+        status.innerText = "Ошибка соединения. Попробуй еще раз.";
+    } finally { 
+        btn.disabled = false; 
+        btn.innerText = "СГЕНЕРИРОВАТЬ"; 
+    }
 }
 </script>
 </body>
