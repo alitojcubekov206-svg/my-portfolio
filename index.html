@@ -4,173 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Портфолио — Али Тойчубеков</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
 <style>
-:root {
-  --bg: #0b0b0f;
-  --card: #14141c;
-  --accent: #ffd700;
-  --neon: #7c7cff;
-}
-
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: var(--bg);
-  color: #fff;
-}
-
+:root { --bg: #0b0b0f; --card: #14141c; --accent: #ffd700; --neon: #7c7cff; }
+body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg); color: #fff; }
 a { color: inherit; text-decoration: none; }
-
-/* HEADER */
-header {
-  text-align: center;
-  padding: 90px 20px;
-  background: radial-gradient(circle at top, #1a1a2e, #000);
-}
-
-header h1 {
-  font-size: 3em;
-  margin-bottom: 10px;
-  color: var(--accent);
-}
-
-header p {
-  margin: 6px 0;
-  opacity: 0.9;
-}
-
-.tag {
-  margin-top: 15px;
-  color: var(--neon);
-  font-weight: 600;
-  letter-spacing: 1px;
-}
-
-/* SECTION */
-section {
-  max-width: 1200px;
-  margin: 60px auto;
-  padding: 0 20px;
-}
-
-h2 {
-  text-align: center;
-  font-size: 2.4em;
-  margin-bottom: 50px;
-  color: var(--accent);
-}
-
-/* AI SECTION (NEW) */
-.ai-card {
-    background: var(--card);
-    border-radius: 22px;
-    padding: 30px;
-    text-align: center;
-    border: 2px solid var(--neon);
-    box-shadow: 0 0 20px rgba(124,124,255,0.2);
-}
-
-.ai-input {
-    width: 80%;
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    background: #0b0b0f;
-    color: white;
-    margin-bottom: 20px;
-    font-family: inherit;
-}
-
-.ai-button {
-    padding: 12px 25px;
-    background: var(--neon);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.ai-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px var(--neon);
-}
-
-#ai-image {
-    width: 100%;
-    max-width: 500px;
-    margin-top: 20px;
-    border-radius: 15px;
-    display: none;
-}
-
-/* PROJECTS */
-.projects {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px;
-}
-
-.project {
-  background: var(--card);
-  border-radius: 22px;
-  padding: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.project:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow:
-    0 0 25px rgba(124,124,255,0.35),
-    0 0 50px rgba(255,215,0,0.15);
-}
-
-.project h3 {
-  margin-top: 0;
-  font-size: 1.3em;
-  color: var(--accent);
-}
-
-.num {
-  color: var(--neon);
-  font-weight: 700;
-  margin-right: 6px;
-}
-
-.project p {
-  font-size: 0.95em;
-  opacity: 0.8;
-}
-
-video {
-  width: 100%;
-  border-radius: 15px;
-  margin-top: 10px;
-}
-
-/* EMPTY PROJECT */
-.empty {
-  opacity: 0.5;
-  text-align: center;
-  font-style: italic;
-}
-
-/* CONTACTS */
-.contacts {
-  text-align: center;
-  padding: 70px 20px;
-  background: #000;
-}
+header { text-align: center; padding: 90px 20px; background: radial-gradient(circle at top, #1a1a2e, #000); }
+header h1 { font-size: 3em; margin-bottom: 10px; color: var(--accent); }
+header p { margin: 6px 0; opacity: 0.9; }
+.tag { margin-top: 15px; color: var(--neon); font-weight: 600; letter-spacing: 1px; }
+section { max-width: 1200px; margin: 60px auto; padding: 0 20px; }
+h2 { text-align: center; font-size: 2.4em; margin-bottom: 50px; color: var(--accent); }
+.ai-card { background: var(--card); border-radius: 22px; padding: 30px; text-align: center; border: 2px solid var(--neon); box-shadow: 0 0 20px rgba(124,124,255,0.2); }
+.ai-input { width: 80%; padding: 12px; border-radius: 10px; border: none; background: #0b0b0f; color: white; margin-bottom: 20px; font-family: inherit; }
+.ai-button { padding: 12px 25px; background: var(--neon); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+.ai-button:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--neon); }
+#ai-image { width: 100%; max-width: 500px; margin-top: 20px; border-radius: 15px; display: none; }
+.projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+.project { background: var(--card); border-radius: 22px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.6); transition: transform 0.3s ease; }
+.project h3 { margin-top: 0; font-size: 1.3em; color: var(--accent); }
+.num { color: var(--neon); font-weight: 700; margin-right: 6px; }
+video { width: 100%; border-radius: 15px; margin-top: 10px; }
+.empty { opacity: 0.5; text-align: center; font-style: italic; }
+.contacts { text-align: center; padding: 70px 20px; background: #000; }
 </style>
 </head>
-
 <body>
-
 <header>
   <h1>Привет, я Али 👋</h1>
   <p><strong>Али Тойчубеков — 8 класс, школа Таалим</strong></p>
@@ -178,10 +37,55 @@ video {
 </header>
 
 <section>
-<h2>Мои проекты</h2>
+  <h2>BitDance AI Studio</h2>
+  <div class="ai-card">
+    <p>Создай шедевр с помощью нейросети BitDance</p>
+    <input type="text" id="ai-prompt" class="ai-input" placeholder="Опиши картинку на английском (например: Neon dragon in forest)...">
+    <br>
+    <button onclick="runAI()" id="ai-btn" class="ai-button">СГЕНЕРИРОВАТЬ</button>
+    <p id="ai-status" style="margin-top: 15px; opacity: 0.7;"></p>
+    <center><img id="ai-image" src="" alt="Результат"></center>
+  </div>
+</section>
 
+<section>
+<h2>Мои проекты</h2>
 <div class="projects">
-<div class="project"><h3><span class="num">#01</span> Проект — Scratch</h3><video controls muted><source src="./scratch1.mp4"></video></div>
-<div class="project"><h3><span class="num">#02</span> Проект — Scratch</h3><video controls muted><source src="./scratch_project2.mp4"></video></div>
-<div class="project"><h3><span class="num">#03</span> Проект — Scratch</h3><video controls muted><source src="./scratch_project.3.mp4"></video></div>
-<div class="project"><h3>
+  <div class="project"><h3><span class="num">#01</span> Проект — Scratch</h3><video controls muted><source src="./scratch1.mp4"></video></div>
+  <div class="project"><h3><span class="num">#02</span> Проект — Scratch</h3><video controls muted><source src="./scratch_project2.mp4"></video></div>
+  <div class="project"><h3><span class="num">#03</span> Проект — Scratch</h3><video controls muted><source src="./scratch_project.3.mp4"></video></div>
+  </div>
+</section>
+
+<section class="contacts">
+<h2>Контакты</h2>
+<p>📞 <a href="tel:+996500502204">+996 500 502 204</a> | 💬 <a href="https://t.me/Reason65">Telegram</a></p>
+</section>
+
+<script>
+async function runAI() {
+    const prompt = document.getElementById('ai-prompt').value;
+    const btn = document.getElementById('ai-btn');
+    const status = document.getElementById('ai-status');
+    const image = document.getElementById('ai-image');
+    if (!prompt) return alert("Напиши описание!");
+    btn.disabled = true; btn.innerText = "РИСУЮ...";
+    status.innerText = "Нейросеть просыпается... Жди около 40 сек.";
+    image.style.display = "none";
+    try {
+        const response = await fetch("https://api-inference.huggingface.co/models/shallowdream204/bitdance", {
+            headers: { Authorization: "Bearer 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" },
+            method: "POST",
+            body: JSON.stringify({ inputs: prompt }),
+        });
+        if (!response.ok) throw new Error("Сервер перегружен. Попробуй еще раз через минуту!");
+        const blob = await response.blob();
+        image.src = URL.createObjectURL(blob);
+        image.style.display = "inline-block";
+        status.innerText = "Готово!";
+    } catch (err) { status.innerText = "Ошибка: " + err.message;
+    } finally { btn.disabled = false; btn.innerText = "СГЕНЕРИРОВАТЬ"; }
+}
+</script>
+</body>
+</html>
