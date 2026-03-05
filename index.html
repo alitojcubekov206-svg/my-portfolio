@@ -2,73 +2,46 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Портфолио — Али</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Портфолио — Али Тойчубеков</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #0b0b0f; color: white; font-family: sans-serif; text-align: center; }
-        .container { max-width: 800px; margin: auto; padding: 20px; }
-        .ai-box { background: #14141c; padding: 30px; border-radius: 20px; border: 2px solid #7c7cff; }
-        input { width: 80%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #333; background: #000; color: #fff; }
-        button { padding: 10px 20px; background: #7c7cff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        #res-img { width: 100%; max-width: 500px; margin-top: 20px; display: none; border-radius: 10px; }
-        .projects { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 50px; }
-        video { width: 300px; border-radius: 10px; background: #000; }
+        :root { --bg: #0b0b0f; --card: #14141c; --accent: #ffd700; --neon: #7c7cff; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg); color: #fff; text-align: center; }
+        header { padding: 80px 20px; background: radial-gradient(circle at top, #1a1a2e, #000); }
+        h1 { font-size: 3em; color: var(--accent); margin-bottom: 10px; }
+        .tag { color: var(--neon); font-weight: 600; letter-spacing: 1px; }
+        section { max-width: 1200px; margin: 50px auto; padding: 0 20px; }
+        .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .project { background: var(--card); border-radius: 20px; padding: 20px; border: 1px solid #333; }
+        video { width: 100%; border-radius: 15px; background: #000; }
+        h3 { color: var(--accent); }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Ali's Portfolio</h1>
-        
-        <div class="ai-box">
-            <h2>BitDance AI Studio</h2>
-            <input type="text" id="prompt" placeholder="Описание на английском...">
-            <br>
-            <button onclick="generate()">СГЕНЕРИРОВАТЬ</button>
-            <p id="status"></p>
-            <img id="res-img" src="">
-        </div>
+    <header>
+        <h1>Привет, я Али 👋</h1>
+        <p><strong>Али Тойчубеков — 8 класс, школа Таалим</strong></p>
+        <p class="tag">🎮 Scratch / Game Developer</p>
+    </header>
 
-        <h2>Мои работы</h2>
+    <section>
+        <h2>Мои проекты</h2>
         <div class="projects">
-            <video controls><source src="./scratch1.mp4"></video>
-            <video controls><source src="./scratch_project2.mp4"></video>
-            <video controls><source src="./scratch_project.3.mp4"></video>
+            <div class="project"><h3>#01 Scratch</h3><video controls><source src="./scratch1.mp4"></video></div>
+            <div class="project"><h3>#02 Scratch</h3><video controls><source src="./scratch_project2.mp4"></video></div>
+            <div class="project"><h3>#03 Scratch</h3><video controls><source src="./scratch_project.3.mp4"></video></div>
+            <div class="project"><h3>#04 Scratch</h3><video controls><source src="./scratch_project4.mp4"></video></div>
+            <div class="project"><h3>#05 Scratch</h3><video controls><source src="./scratch_project5.mp4"></video></div>
+            <div class="project"><h3>#06 Scratch</h3><video controls><source src="./scratch_project6.mp4"></video></div>
+            <div class="project"><h3>#07 Scratch</h3><video controls><source src="./scratch7.mp4"></video></div>
+            <div class="project"><h3>#08 Scratch</h3><video controls><source src="./scratch8.mp4"></video></div>
+            <div class="project"><h3>#09 Scratch</h3><video controls><source src="./scratch9.mp4"></video></div>
         </div>
-    </div>
+    </section>
 
-    <script>
-        async function generate() {
-            const p = document.getElementById('prompt').value;
-            const s = document.getElementById('status');
-            const img = document.getElementById('res-img');
-            
-            if (!p) return alert("Введите текст!");
-
-            // СПРАШИВАЕМ ТОКЕН ТОЛЬКО В МОМЕНТ НАЖАТИЯ
-            const token = window.prompt("Вставь свой новый токен Hugging Face сюда:");
-            if (!token) return;
-
-            s.innerText = "⏳ Рисую... Жди 1 минуту.";
-            img.style.display = "none";
-
-            try {
-                const response = await fetch("https://api-inference.huggingface.co/models/shallowdream204/bitdance", {
-                    headers: { "Authorization": "Bearer " + token.trim() },
-                    method: "POST",
-                    body: JSON.stringify({ inputs: p }),
-                });
-
-                if (response.ok) {
-                    const blob = await response.blob();
-                    img.src = URL.createObjectURL(blob);
-                    img.style.display = "block";
-                    s.innerText = "✅ Готово!";
-                } else {
-                    s.innerText = "❌ Ошибка. Возможно, модель еще не загрузилась. Попробуй через 30 сек.";
-                }
-            } catch (e) {
-                s.innerText = "❌ Ошибка соединения.";
-            }
-        }
-    </script>
+    <footer style="padding: 50px; opacity: 0.6;">
+        <p>Связаться со мной: <a href="https://t.me/Reason65" style="color: var(--neon);">Telegram</a></p>
+    </footer>
 </body>
 </html>
