@@ -19,7 +19,7 @@
         .ai-input { width: 85%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; margin-bottom: 20px; font-size: 16px; }
         .ai-btn { padding: 12px 30px; background: var(--neon); color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
         .ai-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--neon); }
-        .ai-btn:disabled { background: #444; opacity: 0.7; }
+        .ai-btn:disabled { background: #444; cursor: not-allowed; }
         #ai-res { width: 100%; max-width: 500px; margin-top: 25px; border-radius: 15px; display: none; border: 2px solid #333; }
         
         /* Сетка проектов */
@@ -42,7 +42,7 @@
     <h2>BitDance AI Studio</h2>
     <div class="ai-card">
         <p>Нейросеть BitDance создаст картинку по описанию (на англ.):</p>
-        <input type="text" id="prompt" class="ai-input" placeholder="Например: Futuristic knight, neon lights...">
+        <input type="text" id="prompt" class="ai-input" placeholder="Например: Futuristic knight, neon lights, masterpiece...">
         <br>
         <button onclick="runModel()" id="btn" class="ai-btn">СГЕНЕРИРОВАТЬ</button>
         <p id="status" style="margin-top: 15px; color: var(--neon); font-size: 14px;"></p>
@@ -79,11 +79,11 @@ async function runModel() {
     if (!promptInput) return alert("Введите описание на английском!");
 
     button.disabled = true;
-    statusText.innerText = "⏳ Генерация... Пожалуйста, подождите.";
+    statusText.innerText = "⏳ Модель готовится... Это займет 30-60 секунд.";
     resultImg.style.display = "none";
 
-    // ВНИМАНИЕ: Замени текст ниже на свой токен hf_...
-    const apiToken = "hf_ВАШ_НОВЫЙ_ТОКЕН"; 
+    // ВНИМАНИЕ: Вставь свой токен hf_... вместо текста ниже
+    const apiToken = "hf_ВСТАВЬ_СВОЙ_ТОКЕН_ЗДЕСЬ"; 
 
     try {
         const response = await fetch(
@@ -92,14 +92,15 @@ async function runModel() {
                 method: "POST",
                 headers: { 
                     "Authorization": "Bearer " + apiToken.trim(),
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json" 
                 },
                 body: JSON.stringify({ inputs: promptInput }),
             }
         );
 
         if (response.status === 503) {
-            statusText.innerText = "🛰️ Модель просыпается... Попробуйте еще раз через 20 секунд.";
+            const data = await response.json();
+            statusText.innerText = "🛰️ Модель просыпается... Повтори через 20 сек.";
             return;
         }
 
@@ -110,10 +111,11 @@ async function runModel() {
         const blob = await response.blob();
         resultImg.src = URL.createObjectURL(blob);
         resultImg.style.display = "inline-block";
-        statusText.innerText = "✅ Успех!";
+        statusText.innerText = "✅ Готово!";
+
     } catch (err) {
         console.error(err);
-        statusText.innerText = "❌ Ошибка. Проверьте свой токен.";
+        statusText.innerText = "❌ Ошибка. Проверь токен в коде.";
     } finally {
         button.disabled = false;
     }
