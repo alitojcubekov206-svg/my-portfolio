@@ -1,18 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Портфолио — Али Тойчубеков</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0b0b0f; --card: #14141c; --accent: #ffd700; --neon: #7c7cff; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg); color: #fff; text-align: center; line-height: 1.6; }
+        header { padding: 80px 20px; background: radial-gradient(circle at top, #1a1a2e, #000); }
+        h1 { font-size: 3em; color: var(--accent); margin: 0; }
+        .tag { color: var(--neon); font-weight: 600; letter-spacing: 1px; }
+        section { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        h2 { font-size: 2.4em; color: var(--accent); margin-bottom: 30px; }
+        
+        /* Студия ИИ */
+        .ai-card { background: var(--card); border-radius: 20px; padding: 30px; border: 2px solid var(--neon); box-shadow: 0 0 20px rgba(124,124,255,0.2); margin-bottom: 60px; }
+        .ai-input { width: 85%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; margin-bottom: 20px; font-size: 16px; }
+        .ai-btn { padding: 12px 30px; background: var(--neon); color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .ai-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--neon); }
+        .ai-btn:disabled { background: #444; opacity: 0.7; }
+        #ai-res { width: 100%; max-width: 500px; margin-top: 25px; border-radius: 15px; display: none; border: 2px solid #333; }
+        
+        /* Сетка проектов */
+        .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .project { background: var(--card); border-radius: 20px; padding: 20px; border: 1px solid #333; transition: 0.3s; }
+        .project:hover { border-color: var(--neon); transform: translateY(-5px); }
+        video { width: 100%; border-radius: 15px; background: #000; margin-top: 10px; }
+        .num { color: var(--neon); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Привет, я Али 👋</h1>
+    <p>Али Тойчубеков — 8 класс, школа Таалим</p>
+    <p class="tag">🎮 Scratch Developer | AI Enthusiast</p>
+</header>
+
+<section>
+    <h2>BitDance AI Studio</h2>
+    <div class="ai-card">
+        <p>Нейросеть BitDance создаст картинку по описанию (на англ.):</p>
+        <input type="text" id="prompt" class="ai-input" placeholder="Например: Futuristic knight, neon lights...">
+        <br>
+        <button onclick="runModel()" id="btn" class="ai-btn">СГЕНЕРИРОВАТЬ</button>
+        <p id="status" style="margin-top: 15px; color: var(--neon); font-size: 14px;"></p>
+        <center><img id="ai-res" src=""></center>
+    </div>
+</section>
+
+<section>
+    <h2>Мои проекты Scratch</h2>
+    <div class="projects">
+        <div class="project"><h3><span class="num">#01</span> Scratch</h3><video controls><source src="./scratch1.mp4"></video></div>
+        <div class="project"><h3><span class="num">#02</span> Scratch</h3><video controls><source src="./scratch_project2.mp4"></video></div>
+        <div class="project"><h3><span class="num">#03</span> Scratch</h3><video controls><source src="./scratch_project.3.mp4"></video></div>
+        <div class="project"><h3><span class="num">#04</span> Scratch</h3><video controls><source src="./scratch_project4.mp4"></video></div>
+        <div class="project"><h3><span class="num">#05</span> Scratch</h3><video controls><source src="./scratch_project5.mp4"></video></div>
+        <div class="project"><h3><span class="num">#06</span> Scratch</h3><video controls><source src="./scratch_project6.mp4"></video></div>
+        <div class="project"><h3><span class="num">#07</span> Scratch</h3><video controls><source src="./scratch7.mp4"></video></div>
+        <div class="project"><h3><span class="num">#08</span> Scratch</h3><video controls><source src="./scratch8.mp4"></video></div>
+        <div class="project"><h3><span class="num">#09</span> Scratch</h3><video controls><source src="./scratch9.mp4"></video></div>
+    </div>
+</section>
+
+<footer style="padding: 40px; opacity: 0.5;">
+    <p>Связаться: <a href="https://t.me/Reason65" style="color: var(--neon); text-decoration: none;">Telegram</a></p>
+</footer>
+
+<script>
 async function runModel() {
     const promptInput = document.getElementById('prompt').value;
     const button = document.getElementById('btn');
     const statusText = document.getElementById('status');
     const resultImg = document.getElementById('ai-res');
 
-    if (!promptInput) return alert("Please enter description!");
+    if (!promptInput) return alert("Введите описание на английском!");
 
     button.disabled = true;
-    statusText.innerText = "⏳ Generating image... Please wait.";
+    statusText.innerText = "⏳ Генерация... Пожалуйста, подождите.";
     resultImg.style.display = "none";
 
-    // ВНИМАНИЕ: Вставь свой НОВЫЙ токен строго между кавычками. 
-    // Убедись, что нет лишних пробелов.
-    const apiToken = "hf_ВСТАВЬ_СВОЙ_НОВЫЙ_ТОКЕН_ТУТ"; 
+    // ВНИМАНИЕ: Замени текст ниже на свой токен hf_...
+    const apiToken = "hf_ВАШ_НОВЫЙ_ТОКЕН"; 
 
     try {
         const response = await fetch(
@@ -27,25 +98,27 @@ async function runModel() {
             }
         );
 
-        // Если модель загружается (503), нужно подождать
         if (response.status === 503) {
-            const data = await response.json();
-            statusText.innerText = "🛰️ Model is waking up... Try again in 20 seconds.";
+            statusText.innerText = "🛰️ Модель просыпается... Попробуйте еще раз через 20 секунд.";
             return;
         }
 
         if (!response.ok) {
-            throw new Error("API Error: " + response.status);
+            throw new Error("Ошибка API: " + response.status);
         }
 
         const blob = await response.blob();
         resultImg.src = URL.createObjectURL(blob);
         resultImg.style.display = "inline-block";
-        statusText.innerText = "✅ Success!";
+        statusText.innerText = "✅ Успех!";
     } catch (err) {
         console.error(err);
-        statusText.innerText = "❌ Connection error. Check your token.";
+        statusText.innerText = "❌ Ошибка. Проверьте свой токен.";
     } finally {
         button.disabled = false;
     }
 }
+</script>
+
+</body>
+</html>
