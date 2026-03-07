@@ -42,11 +42,11 @@ async function runModel() {
     if (!promptInput) return alert("Введите описание!");
 
     button.disabled = true;
-    statusText.innerText = "⏳ Нейросеть рисует... (10-15 сек)";
+    statusText.innerText = "⏳ Нейросеть генерирует... (10-15 сек)";
     resultImg.style.display = "none";
 
-    // Используем твой НОВЫЙ токен
-    const apiToken = "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";
+    // Твой НОВЫЙ токен
+    const apiToken = "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";
 
     try {
         const response = await fetch(
@@ -65,7 +65,7 @@ async function runModel() {
         );
 
         if (response.status === 401) {
-            throw new Error("Токен не включен! Зайди в настройки токена и поставь галочку 'Inference'.");
+            throw new Error("Токен не включен! Проверь галочку 'Inference' в настройках токена.");
         }
 
         if (!response.ok) throw new Error("Ошибка API: " + response.status);
