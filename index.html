@@ -2,63 +2,35 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Портфолио — Али Тойчубеков</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #0b0b0f; --card: #14141c; --accent: #ffd700; --neon: #7c7cff; }
-        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg); color: #fff; text-align: center; line-height: 1.6; }
-        header { padding: 80px 20px; background: radial-gradient(circle at top, #1a1a2e, #000); }
-        h1 { font-size: 3em; color: var(--accent); margin: 0; }
-        .tag { color: var(--neon); font-weight: 600; letter-spacing: 1px; }
-        section { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        h2 { font-size: 2.4em; color: var(--accent); margin-bottom: 30px; }
-        
-        .ai-card { background: var(--card); border-radius: 20px; padding: 30px; border: 2px solid var(--neon); box-shadow: 0 0 20px rgba(124,124,255,0.2); margin-bottom: 60px; }
-        .ai-input { width: 85%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; margin-bottom: 20px; font-size: 16px; }
-        .ai-btn { padding: 12px 30px; background: var(--neon); color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .ai-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--neon); }
-        .ai-btn:disabled { background: #444; cursor: not-allowed; }
-        #ai-res { width: 100%; max-width: 500px; margin-top: 25px; border-radius: 15px; display: none; border: 2px solid #333; }
-        
-        .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .project { background: var(--card); border-radius: 20px; padding: 20px; border: 1px solid #333; transition: 0.3s; }
-        video { width: 100%; border-radius: 15px; background: #000; margin-top: 10px; }
-        .num { color: var(--neon); font-weight: bold; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg); color: #fff; text-align: center; }
+        header { padding: 60px 20px; background: radial-gradient(circle at top, #1a1a2e, #000); }
+        .ai-card { background: var(--card); border-radius: 20px; padding: 30px; border: 2px solid var(--neon); margin: 20px auto; max-width: 800px; }
+        .ai-input { width: 80%; padding: 12px; border-radius: 10px; background: #000; color: #fff; border: 1px solid #333; margin-bottom: 20px; }
+        .ai-btn { padding: 12px 30px; background: var(--neon); color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        #ai-res { width: 100%; max-width: 500px; margin-top: 25px; border-radius: 15px; display: none; }
     </style>
 </head>
 <body>
 
 <header>
     <h1>Привет, я Али 👋</h1>
-    <p>Али Тойчубеков — 8 класс, школа Таалим</p>
-    <p class="tag">🎮 Scratch Developer | AI Enthusiast</p>
+    <p>Scratch Developer | AI Enthusiast</p>
 </header>
 
 <section>
     <h2>AI Image Studio</h2>
     <div class="ai-card">
-        <p>Нейросеть создаст картинку по описанию (на англ.):</p>
-        <input type="text" id="prompt" class="ai-input" placeholder="Например: Cyberpunk city, neon lights, masterpiece, 8k...">
+        <input type="text" id="prompt" class="ai-input" placeholder="Опишите картинку на английском...">
         <br>
         <button onclick="runModel()" id="btn" class="ai-btn">СГЕНЕРИРОВАТЬ</button>
         <p id="status" style="margin-top: 15px; color: var(--neon); font-size: 14px;"></p>
         <center><img id="ai-res" src=""></center>
     </div>
 </section>
-
-<section>
-    <h2>Мои проекты Scratch</h2>
-    <div class="projects">
-        <div class="project"><h3><span class="num">#01</span> Scratch</h3><video controls><source src="./scratch1.mp4"></video></div>
-        <div class="project"><h3><span class="num">#02</span> Scratch</h3><video controls><source src="./scratch_project2.mp4"></video></div>
-        <div class="project"><h3><span class="num">#03</span> Scratch</h3><video controls><source src="./scratch_project.3.mp4"></video></div>
-    </div>
-</section>
-
-<footer style="padding: 40px; opacity: 0.5;">
-    <p>Связаться: <a href="https://t.me/Reason65" style="color: var(--neon); text-decoration: none;">Telegram</a></p>
-</footer>
 
 <script>
 async function runModel() {
@@ -67,13 +39,13 @@ async function runModel() {
     const statusText = document.getElementById('status');
     const resultImg = document.getElementById('ai-res');
 
-    if (!promptInput) return alert("Введите описание на английском!");
+    if (!promptInput) return alert("Введите описание!");
 
     button.disabled = true;
-    statusText.innerText = "⏳ Нейросеть генерирует изображение... Это займет 10-15 секунд.";
+    statusText.innerText = "⏳ Нейросеть рисует... (10-15 сек)";
     resultImg.style.display = "none";
 
-    // Твой новый токен
+    // Используем твой НОВЫЙ токен
     const apiToken = "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";
 
     try {
@@ -87,15 +59,16 @@ async function runModel() {
                 },
                 body: JSON.stringify({ 
                     inputs: promptInput,
-                    options: { wait_for_model: true } 
+                    options: { wait_for_model: true }
                 }),
             }
         );
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || "Ошибка сервера");
+        if (response.status === 401) {
+            throw new Error("Токен не включен! Зайди в настройки токена и поставь галочку 'Inference'.");
         }
+
+        if (!response.ok) throw new Error("Ошибка API: " + response.status);
 
         const blob = await response.blob();
         resultImg.src = URL.createObjectURL(blob);
@@ -104,12 +77,11 @@ async function runModel() {
 
     } catch (err) {
         console.error(err);
-        statusText.innerText = "❌ Ошибка: " + err.message;
+        statusText.innerText = "❌ " + err.message;
     } finally {
         button.disabled = false;
     }
 }
 </script>
-
 </body>
 </html>
