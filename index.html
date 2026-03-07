@@ -14,6 +14,7 @@
         section { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
         h2 { font-size: 2.4em; color: var(--accent); margin-bottom: 30px; }
         
+        /* Студия ИИ */
         .ai-card { background: var(--card); border-radius: 20px; padding: 30px; border: 2px solid var(--neon); box-shadow: 0 0 20px rgba(124,124,255,0.2); margin-bottom: 60px; }
         .ai-input { width: 85%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; margin-bottom: 20px; font-size: 16px; }
         .ai-btn { padding: 12px 30px; background: var(--neon); color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
@@ -21,6 +22,7 @@
         .ai-btn:disabled { background: #444; cursor: not-allowed; }
         #ai-res { width: 100%; max-width: 500px; margin-top: 25px; border-radius: 15px; display: none; border: 2px solid #333; }
         
+        /* Сетка проектов */
         .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
         .project { background: var(--card); border-radius: 20px; padding: 20px; border: 1px solid #333; transition: 0.3s; }
         .project:hover { border-color: var(--neon); transform: translateY(-5px); }
@@ -37,13 +39,13 @@
 </header>
 
 <section>
-    <h2>BitDance AI Studio</h2>
+    <h2>AI Image Studio</h2>
     <div class="ai-card">
-        <p>Нейросеть BitDance создаст картинку по описанию (на англ.):</p>
+        <p>Нейросеть создаст картинку по описанию (на англ.):</p>
         <input type="text" id="prompt" class="ai-input" placeholder="Например: Futuristic knight, neon lights, masterpiece...">
         <br>
         <button onclick="runModel()" id="btn" class="ai-btn">СГЕНЕРИРОВАТЬ</button>
-        <p id="status" style="margin-top: 15px; color: var(--neon); font-size: 14px; white-space: pre-wrap;"></p>
+        <p id="status" style="margin-top: 15px; color: var(--neon); font-size: 14px;"></p>
         <center><img id="ai-res" src=""></center>
     </div>
 </section>
@@ -77,21 +79,20 @@ async function runModel() {
     if (!promptInput) return alert("Введите описание на английском!");
 
     button.disabled = true;
-    statusText.innerText = "⏳ Запрос отправлен. Подождите, модель может загружаться до 60 секунд...";
+    statusText.innerText = "⏳ Нейросеть генерирует изображение...";
     resultImg.style.display = "none";
 
-    // Токен (проверь, чтобы он был активен в настройках Hugging Face)
+    // Твой API Токен
     const apiToken = "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";
 
     try {
         const response = await fetch(
-            "https://api-inference.huggingface.co/models/shallowdream204/bitdance",
+            "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
             {
                 method: "POST",
                 headers: { 
                     "Authorization": `Bearer ${apiToken.trim()}`,
-                    "Content-Type": "application/json",
-                    "x-use-cache": "false" 
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ 
                     inputs: promptInput,
@@ -101,33 +102,17 @@ async function runModel() {
         );
 
         if (!response.ok) {
-            const errorData = await response.json();
-            // Если модель еще грузится, HF иногда возвращает 503 даже с wait_for_model
-            if (response.status === 503) {
-                statusText.innerText = "🛰️ Модель всё ещё загружается на сервер. Попробуйте нажать кнопку ещё раз через 30 секунд.";
-            } else {
-                statusText.innerText = `❌ Ошибка сервера (${response.status}): ${errorData.error || 'Неизвестная ошибка'}`;
-            }
-            throw new Error(`Статус: ${response.status}`);
+            throw new Error(`Ошибка: ${response.status}`);
         }
 
         const blob = await response.blob();
-        if (blob.type.includes('json')) {
-            // Если вместо картинки пришел JSON, значит там описание ошибки
-            const text = await blob.text();
-            statusText.innerText = "❌ Ошибка формата: сервер прислал текст вместо картинки.";
-            console.error(text);
-        } else {
-            resultImg.src = URL.createObjectURL(blob);
-            resultImg.style.display = "inline-block";
-            statusText.innerText = "✅ Изображение успешно создано!";
-        }
+        resultImg.src = URL.createObjectURL(blob);
+        resultImg.style.display = "inline-block";
+        statusText.innerText = "✅ Готово!";
 
     } catch (err) {
-        console.error("Критическая ошибка:", err);
-        if (err.message.includes('fetch')) {
-            statusText.innerText = "❌ Ошибка сети или CORS. Попробуйте обновить страницу или использовать другой браузер.";
-        }
+        console.error(err);
+        statusText.innerText = "❌ Ошибка. Проверьте токен или попробуйте позже.";
     } finally {
         button.disabled = false;
     }
