@@ -35,7 +35,7 @@
     <h2>AI Image Studio</h2>
     <div class="ai-card">
         <p>Нейросеть создаст картинку по описанию (на англ.):</p>
-        <input type="text" id="prompt" class="ai-input" placeholder="Например: Cyberpunk cat, neon lights, 8k...">
+        <input type="text" id="prompt" class="ai-input" placeholder="Например: Cyberpunk city, neon lights, 8k...">
         <br>
         <button onclick="runModel()" id="btn" class="ai-btn">СГЕНЕРИРОВАТЬ</button>
         <p id="status" style="margin-top: 15px; color: var(--neon); font-size: 14px;"></p>
@@ -62,18 +62,18 @@ async function runModel() {
     if (!promptInput) return alert("Введите описание!");
 
     button.disabled = true;
-    statusText.innerText = "⏳ Идет генерация через прокси... Пожалуйста, подождите.";
+    statusText.innerText = "⏳ Генерация через прокси... Пожалуйста, подождите.";
     resultImg.style.display = "none";
 
-    // Твой токен (проверь еще раз, что он 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)
     const apiToken = "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";
     
-    // Мы используем публичный CORS прокси для обхода блокировки
-    const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+    // Используем новый прокси без обязательного подтверждения
+    const proxyUrl = "https://cors-anywhere.com/";
     const apiUrl = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
 
     try {
-        const response = await fetch(apiUrl, {
+        // Объединяем прокси и адрес API
+        const response = await fetch(proxyUrl + apiUrl, {
             method: "POST",
             headers: { 
                 "Authorization": `Bearer ${apiToken.trim()}`,
@@ -86,19 +86,17 @@ async function runModel() {
         });
 
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Сервер ответил:", errorText);
-            throw new Error(`Ошибка API: ${response.status}`);
+            throw new Error(`Ошибка: ${response.status}`);
         }
 
         const blob = await response.blob();
         resultImg.src = URL.createObjectURL(blob);
         resultImg.style.display = "inline-block";
-        statusText.innerText = "✅ Готово!";
+        statusText.innerText = "✅ Изображение создано!";
 
     } catch (err) {
-        console.error("Ошибка:", err);
-        statusText.innerText = "❌ Проблема с доступом. Попробуй обновить страницу.";
+        console.error(err);
+        statusText.innerText = "❌ Ошибка. Проверь консоль браузера.";
     } finally {
         button.disabled = false;
     }
