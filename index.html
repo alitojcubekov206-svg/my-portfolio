@@ -79,11 +79,11 @@ async function runModel() {
     if (!promptInput) return alert("Введите описание на английском!");
 
     button.disabled = true;
-    statusText.innerText = "⏳ Модель готовится... Это займет 30-60 секунд.";
+    statusText.innerText = "⏳ Нейросеть просыпается... Это может занять до 60 секунд.";
     resultImg.style.display = "none";
 
-    // ВНИМАНИЕ: Вставь свой токен hf_... вместо текста ниже
-   const apiToken = "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";
+    // Твой токен (Помни: на GitHub его могут увидеть другие!)
+    const apiToken = "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";
 
     try {
         const response = await fetch(
@@ -91,21 +91,20 @@ async function runModel() {
             {
                 method: "POST",
                 headers: { 
-                    "Authorization": "Bearer " + apiToken.trim(),
-                    "Content-Type": "application/json" 
+                    "Authorization": `Bearer ${apiToken.trim()}`,
+                    "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ inputs: promptInput }),
+                body: JSON.stringify({ 
+                    inputs: promptInput,
+                    options: { wait_for_model: true } 
+                }),
             }
         );
 
-        if (response.status === 503) {
-            const data = await response.json();
-            statusText.innerText = "🛰️ Модель просыпается... Повтори через 20 сек.";
-            return;
-        }
-
         if (!response.ok) {
-            throw new Error("Ошибка API: " + response.status);
+            const errorText = await response.text();
+            console.error("Ошибка от сервера:", errorText);
+            throw new Error(`Ошибка API: ${response.status}`);
         }
 
         const blob = await response.blob();
@@ -114,8 +113,8 @@ async function runModel() {
         statusText.innerText = "✅ Готово!";
 
     } catch (err) {
-        console.error(err);
-        statusText.innerText = "❌ Ошибка. Проверь токен в коде.";
+        console.error("Детали ошибки:", err);
+        statusText.innerText = "❌ Ошибка. Возможно, модель ещё загружается. Попробуй через минуту.";
     } finally {
         button.disabled = false;
     }
