@@ -13,14 +13,18 @@
         .tag { color: var(--neon); font-weight: 600; letter-spacing: 1px; }
         section { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
         h2 { font-size: 2.4em; color: var(--accent); margin-bottom: 30px; }
-        .ai-card { background: var(--card); border-radius: 20px; padding: 30px; border: 2px solid var(--neon); box-shadow: 0 0 20px rgba(124,124,255,0.2); }
+        
+        .ai-card { background: var(--card); border-radius: 20px; padding: 30px; border: 2px solid var(--neon); box-shadow: 0 0 20px rgba(124,124,255,0.2); margin-bottom: 60px; }
         .ai-input { width: 85%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; margin-bottom: 20px; font-size: 16px; }
-        .ai-btn { padding: 12px 30px; background: var(--neon); color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .ai-btn { padding: 12px 30px; background: var(--neon); color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .ai-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--neon); }
         .ai-btn:disabled { background: #444; cursor: not-allowed; }
         #ai-res { width: 100%; max-width: 500px; margin-top: 25px; border-radius: 15px; display: none; border: 2px solid #333; }
+        
         .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .project { background: var(--card); border-radius: 20px; padding: 20px; border: 1px solid #333; }
+        .project { background: var(--card); border-radius: 20px; padding: 20px; border: 1px solid #333; transition: 0.3s; }
         video { width: 100%; border-radius: 15px; background: #000; margin-top: 10px; }
+        .num { color: var(--neon); font-weight: bold; }
     </style>
 </head>
 <body>
@@ -35,7 +39,7 @@
     <h2>AI Image Studio</h2>
     <div class="ai-card">
         <p>Нейросеть создаст картинку по описанию (на англ.):</p>
-        <input type="text" id="prompt" class="ai-input" placeholder="Например: Cyberpunk city, neon lights, 8k...">
+        <input type="text" id="prompt" class="ai-input" placeholder="Например: Cyberpunk city, neon lights, masterpiece, 8k...">
         <br>
         <button onclick="runModel()" id="btn" class="ai-btn">СГЕНЕРИРОВАТЬ</button>
         <p id="status" style="margin-top: 15px; color: var(--neon); font-size: 14px;"></p>
@@ -46,11 +50,15 @@
 <section>
     <h2>Мои проекты Scratch</h2>
     <div class="projects">
-        <div class="project"><h3>#01 Scratch</h3><video controls><source src="./scratch1.mp4"></video></div>
-        <div class="project"><h3>#02 Scratch</h3><video controls><source src="./scratch_project2.mp4"></video></div>
-        <div class="project"><h3>#03 Scratch</h3><video controls><source src="./scratch_project.3.mp4"></video></div>
+        <div class="project"><h3><span class="num">#01</span> Scratch</h3><video controls><source src="./scratch1.mp4"></video></div>
+        <div class="project"><h3><span class="num">#02</span> Scratch</h3><video controls><source src="./scratch_project2.mp4"></video></div>
+        <div class="project"><h3><span class="num">#03</span> Scratch</h3><video controls><source src="./scratch_project.3.mp4"></video></div>
     </div>
 </section>
+
+<footer style="padding: 40px; opacity: 0.5;">
+    <p>Связаться: <a href="https://t.me/Reason65" style="color: var(--neon); text-decoration: none;">Telegram</a></p>
+</footer>
 
 <script>
 async function runModel() {
@@ -59,44 +67,44 @@ async function runModel() {
     const statusText = document.getElementById('status');
     const resultImg = document.getElementById('ai-res');
 
-    if (!promptInput) return alert("Введите описание!");
+    if (!promptInput) return alert("Введите описание на английском!");
 
     button.disabled = true;
-    statusText.innerText = "⏳ Генерация через прокси... Пожалуйста, подождите.";
+    statusText.innerText = "⏳ Нейросеть генерирует изображение... Это займет 10-15 секунд.";
     resultImg.style.display = "none";
 
-    const apiToken = "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";
-    
-    // Используем новый прокси без обязательного подтверждения
-    const proxyUrl = "https://cors-anywhere.com/";
-    const apiUrl = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
+    // Твой новый токен
+    const apiToken = "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";
 
     try {
-        // Объединяем прокси и адрес API
-        const response = await fetch(proxyUrl + apiUrl, {
-            method: "POST",
-            headers: { 
-                "Authorization": `Bearer ${apiToken.trim()}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ 
-                inputs: promptInput,
-                options: { wait_for_model: true } 
-            }),
-        });
+        const response = await fetch(
+            "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
+            {
+                method: "POST",
+                headers: { 
+                    "Authorization": `Bearer ${apiToken.trim()}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ 
+                    inputs: promptInput,
+                    options: { wait_for_model: true } 
+                }),
+            }
+        );
 
         if (!response.ok) {
-            throw new Error(`Ошибка: ${response.status}`);
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Ошибка сервера");
         }
 
         const blob = await response.blob();
         resultImg.src = URL.createObjectURL(blob);
         resultImg.style.display = "inline-block";
-        statusText.innerText = "✅ Изображение создано!";
+        statusText.innerText = "✅ Готово!";
 
     } catch (err) {
         console.error(err);
-        statusText.innerText = "❌ Ошибка. Проверь консоль браузера.";
+        statusText.innerText = "❌ Ошибка: " + err.message;
     } finally {
         button.disabled = false;
     }
