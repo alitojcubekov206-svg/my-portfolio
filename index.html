@@ -2,16 +2,21 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Портфолио — Али Тойчубеков</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #0b0b0f; --card: #14141c; --accent: #ffd700; --neon: #7c7cff; }
         body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg); color: #fff; text-align: center; }
         header { padding: 60px 20px; background: radial-gradient(circle at top, #1a1a2e, #000); }
-        .ai-card { background: var(--card); border-radius: 20px; padding: 30px; border: 2px solid var(--neon); margin: 20px auto; max-width: 800px; }
-        .ai-input { width: 80%; padding: 12px; border-radius: 10px; background: #000; color: #fff; border: 1px solid #333; margin-bottom: 20px; }
-        .ai-btn { padding: 12px 30px; background: var(--neon); color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        #ai-res { width: 100%; max-width: 500px; margin-top: 25px; border-radius: 15px; display: none; }
+        .ai-card { background: var(--card); border-radius: 20px; padding: 30px; border: 2px solid var(--neon); margin: 20px auto; max-width: 800px; box-shadow: 0 0 20px rgba(124, 124, 255, 0.2); }
+        .ai-input { width: 80%; padding: 12px; border-radius: 10px; background: #000; color: #fff; border: 1px solid #333; margin-bottom: 20px; outline: none; }
+        .ai-input:focus { border-color: var(--neon); }
+        .ai-btn { padding: 12px 30px; background: var(--neon); color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .ai-btn:hover { opacity: 0.8; transform: scale(1.05); }
+        .ai-btn:disabled { background: #444; cursor: not-allowed; }
+        #ai-res { width: 100%; max-width: 512px; margin-top: 25px; border-radius: 15px; display: none; border: 1px solid #333; }
+        #status { margin-top: 15px; color: var(--neon); font-size: 14px; min-height: 20px; }
     </style>
 </head>
 <body>
@@ -24,11 +29,11 @@
 <section>
     <h2>AI Image Studio</h2>
     <div class="ai-card">
-        <input type="text" id="prompt" class="ai-input" placeholder="Опишите картинку на английском...">
+        <input type="text" id="prompt" class="ai-input" placeholder="Опишите картинку на английском (например: neon cat)...">
         <br>
         <button onclick="runModel()" id="btn" class="ai-btn">СГЕНЕРИРОВАТЬ</button>
-        <p id="status" style="margin-top: 15px; color: var(--neon); font-size: 14px;"></p>
-        <center><img id="ai-res" src=""></center>
+        <p id="status"></p>
+        <center><img id="ai-res" src="" alt="Результат генерации"></center>
     </div>
 </section>
 
@@ -39,14 +44,18 @@ async function runModel() {
     const statusText = document.getElementById('status');
     const resultImg = document.getElementById('ai-res');
 
-    if (!promptInput) return alert("Введите описание!");
+    if (!promptInput) {
+        alert("Введите описание на английском!");
+        return;
+    }
 
+    // Подготовка интерфейса
     button.disabled = true;
-    statusText.innerText = "⏳ Нейросеть генерирует... (10-15 сек)";
+    statusText.innerText = "⏳ Нейросеть генерирует... (около 10-15 сек)";
     resultImg.style.display = "none";
 
-    // Твой НОВЫЙ токен
-    const apiToken = "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";
+    // Твой актуальный токен
+    const apiToken = "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";
 
     try {
         const response = await fetch(
@@ -57,31 +66,39 @@ async function runModel() {
                     "Authorization": `Bearer ${apiToken.trim()}`,
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ 
-                    inputs: promptInput,
-                    options: { wait_for_model: true }
-                }),
+                body: JSON.stringify({ inputs: promptInput }),
             }
         );
 
-        if (response.status === 401) {
-            throw new Error("Токен не включен! Проверь галочку 'Inference' в настройках токена.");
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: "Ошибка сервера" }));
+            // Если модель еще загружается на сервер Hugging Face
+            if (response.status === 503) {
+                throw new Error("Модель загружается. Попробуйте еще раз через 20 секунд.");
+            }
+            throw new Error(errorData.error || `Ошибка API: ${response.status}`);
         }
 
-        if (!response.ok) throw new Error("Ошибка API: " + response.status);
-
         const blob = await response.blob();
-        resultImg.src = URL.createObjectURL(blob);
+        
+        // Если вместо картинки пришел текст (редкая ошибка API)
+        if (blob.type.includes('json')) {
+            throw new Error("Не удалось получить изображение. Попробуйте другой запрос.");
+        }
+
+        const imageUrl = URL.createObjectURL(blob);
+        resultImg.src = imageUrl;
         resultImg.style.display = "inline-block";
         statusText.innerText = "✅ Готово!";
 
     } catch (err) {
-        console.error(err);
+        console.error("Детали ошибки:", err);
         statusText.innerText = "❌ " + err.message;
     } finally {
         button.disabled = false;
     }
 }
 </script>
+
 </body>
 </html>
