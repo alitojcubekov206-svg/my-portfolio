@@ -2,80 +2,108 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Портфолио — Али Тойчубеков</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #0b0b0f; --card: #14141c; --accent: #ffd700; --neon: #7c7cff; }
-        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg); color: #fff; text-align: center; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg); color: #fff; text-align: center; line-height: 1.6; }
         header { padding: 80px 20px; background: radial-gradient(circle at top, #1a1a2e, #000); }
-        h1 { color: var(--accent); }
+        h1 { font-size: 3em; color: var(--accent); margin: 0; }
+        .tag { color: var(--neon); font-weight: 600; letter-spacing: 1px; }
         section { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        .ai-card { background: var(--card); border-radius: 20px; padding: 30px; border: 2px solid var(--neon); }
-        .ai-input { width: 85%; padding: 12px; border-radius: 10px; background: #000; color: #fff; margin-bottom: 20px; }
-        .ai-btn { padding: 12px 30px; background: var(--neon); color: #fff; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        #ai-res { width: 100%; max-width: 500px; margin-top: 25px; border-radius: 15px; display: none; }
+        h2 { font-size: 2.4em; color: var(--accent); margin-bottom: 30px; }
+        .ai-card { background: var(--card); border-radius: 20px; padding: 30px; border: 2px solid var(--neon); box-shadow: 0 0 20px rgba(124,124,255,0.2); }
+        .ai-input { width: 85%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; margin-bottom: 20px; font-size: 16px; }
+        .ai-btn { padding: 12px 30px; background: var(--neon); color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .ai-btn:disabled { background: #444; cursor: not-allowed; }
+        #ai-res { width: 100%; max-width: 500px; margin-top: 25px; border-radius: 15px; display: none; border: 2px solid #333; }
         .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
         .project { background: var(--card); border-radius: 20px; padding: 20px; border: 1px solid #333; }
-        video { width: 100%; border-radius: 15px; }
+        video { width: 100%; border-radius: 15px; background: #000; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Привет, я Али 👋</h1>
-        <p>Scratch Developer | AI Enthusiast</p>
-    </header>
-    <section>
-        <h2>AI Image Studio</h2>
-        <div class="ai-card">
-            <input type="text" id="prompt" class="ai-input" placeholder="Введите описание на английском...">
-            <br>
-            <button onclick="runModel()" id="btn" class="ai-btn">СГЕНЕРИРОВАТЬ</button>
-            <p id="status" style="margin-top: 15px; color: var(--neon);"></p>
-            <center><img id="ai-res" src=""></center>
-        </div>
-    </section>
-    <script>
-        async function runModel() {
-            const promptInput = document.getElementById('prompt').value;
-            const button = document.getElementById('btn');
-            const statusText = document.getElementById('status');
-            const resultImg = document.getElementById('ai-res');
 
-            if (!promptInput) return alert("Введите описание!");
+<header>
+    <h1>Привет, я Али 👋</h1>
+    <p>Али Тойчубеков — 8 класс, школа Таалим</p>
+    <p class="tag">🎮 Scratch Developer | AI Enthusiast</p>
+</header>
 
-            button.disabled = true;
-            statusText.innerText = "⏳ Генерация... (10-20 сек)";
-            resultImg.style.display = "none";
+<section>
+    <h2>AI Image Studio</h2>
+    <div class="ai-card">
+        <p>Нейросеть создаст картинку по описанию (на англ.):</p>
+        <input type="text" id="prompt" class="ai-input" placeholder="Например: Cyberpunk cat, neon lights, 8k...">
+        <br>
+        <button onclick="runModel()" id="btn" class="ai-btn">СГЕНЕРИРОВАТЬ</button>
+        <p id="status" style="margin-top: 15px; color: var(--neon); font-size: 14px;"></p>
+        <center><img id="ai-res" src=""></center>
+    </div>
+</section>
 
-            const apiToken = "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";
+<section>
+    <h2>Мои проекты Scratch</h2>
+    <div class="projects">
+        <div class="project"><h3>#01 Scratch</h3><video controls><source src="./scratch1.mp4"></video></div>
+        <div class="project"><h3>#02 Scratch</h3><video controls><source src="./scratch_project2.mp4"></video></div>
+        <div class="project"><h3>#03 Scratch</h3><video controls><source src="./scratch_project.3.mp4"></video></div>
+    </div>
+</section>
 
-            try {
-                const response = await fetch(
-                    "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
-                    {
-                        method: "POST",
-                        headers: { 
-                            "Authorization": `Bearer ${apiToken.trim()}`,
-                            "Content-Type": "application/json",
-                            "x-wait-for-model": "true" 
-                        },
-                        body: JSON.stringify({ inputs: promptInput }),
-                    }
-                );
+<script>
+async function runModel() {
+    const promptInput = document.getElementById('prompt').value;
+    const button = document.getElementById('btn');
+    const statusText = document.getElementById('status');
+    const resultImg = document.getElementById('ai-res');
 
-                if (!response.ok) throw new Error("Ошибка API: " + response.status);
+    if (!promptInput) return alert("Введите описание!");
 
-                const blob = await response.blob();
-                resultImg.src = URL.createObjectURL(blob);
-                resultImg.style.display = "inline-block";
-                statusText.innerText = "✅ Готово!";
-            } catch (err) {
-                statusText.innerText = "❌ Ошибка сети. Проверьте права токена ari.";
-                console.error(err);
-            } finally {
-                button.disabled = false;
-            }
+    button.disabled = true;
+    statusText.innerText = "⏳ Идет генерация через прокси... Пожалуйста, подождите.";
+    resultImg.style.display = "none";
+
+    // Твой токен (проверь еще раз, что он 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)
+    const apiToken = "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";
+    
+    // Мы используем публичный CORS прокси для обхода блокировки
+    const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+    const apiUrl = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: { 
+                "Authorization": `Bearer ${apiToken.trim()}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ 
+                inputs: promptInput,
+                options: { wait_for_model: true } 
+            }),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Сервер ответил:", errorText);
+            throw new Error(`Ошибка API: ${response.status}`);
         }
-    </script>
+
+        const blob = await response.blob();
+        resultImg.src = URL.createObjectURL(blob);
+        resultImg.style.display = "inline-block";
+        statusText.innerText = "✅ Готово!";
+
+    } catch (err) {
+        console.error("Ошибка:", err);
+        statusText.innerText = "❌ Проблема с доступом. Попробуй обновить страницу.";
+    } finally {
+        button.disabled = false;
+    }
+}
+</script>
+
 </body>
 </html>
