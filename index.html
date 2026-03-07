@@ -42,7 +42,7 @@
     <h2>AI Image Studio</h2>
     <div class="ai-card">
         <p>Нейросеть создаст картинку по описанию (на англ.):</p>
-        <input type="text" id="prompt" class="ai-input" placeholder="Например: Futuristic knight, neon lights, masterpiece...">
+        <input type="text" id="prompt" class="ai-input" placeholder="Например: Cyberpunk city, neon lights, 8k resolution...">
         <br>
         <button onclick="runModel()" id="btn" class="ai-btn">СГЕНЕРИРОВАТЬ</button>
         <p id="status" style="margin-top: 15px; color: var(--neon); font-size: 14px;"></p>
@@ -79,11 +79,11 @@ async function runModel() {
     if (!promptInput) return alert("Введите описание на английском!");
 
     button.disabled = true;
-    statusText.innerText = "⏳ Нейросеть генерирует изображение...";
+    statusText.innerText = "⏳ Нейросеть генерирует изображение... Это займет 10-15 секунд.";
     resultImg.style.display = "none";
 
-    // Твой API Токен
-    const apiToken = "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";
+    // Твой новый токен
+    const apiToken = "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";
 
     try {
         const response = await fetch(
@@ -102,7 +102,8 @@ async function runModel() {
         );
 
         if (!response.ok) {
-            throw new Error(`Ошибка: ${response.status}`);
+            const errorInfo = await response.json();
+            throw new Error(errorInfo.error || "Ошибка сервера");
         }
 
         const blob = await response.blob();
@@ -112,7 +113,7 @@ async function runModel() {
 
     } catch (err) {
         console.error(err);
-        statusText.innerText = "❌ Ошибка. Проверьте токен или попробуйте позже.";
+        statusText.innerText = "❌ Ошибка: " + err.message;
     } finally {
         button.disabled = false;
     }
