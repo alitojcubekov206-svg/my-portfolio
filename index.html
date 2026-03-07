@@ -19,6 +19,7 @@
         .ai-input { width: 85%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; margin-bottom: 20px; font-size: 16px; }
         .ai-btn { padding: 12px 30px; background: var(--neon); color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
         .ai-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--neon); }
+        .ai-btn:disabled { background: #444; cursor: not-allowed; }
         #ai-res { width: 100%; max-width: 500px; margin-top: 25px; border-radius: 15px; display: none; border: 2px solid #333; }
         
         /* Сетка проектов */
@@ -50,7 +51,7 @@
 </section>
 
 <section>
-    <h2>Мои проекты</h2>
+    <h2>Мои проекты Scratch</h2>
     <div class="projects">
         <div class="project"><h3><span class="num">#01</span> Scratch</h3><video controls><source src="./scratch1.mp4"></video></div>
         <div class="project"><h3><span class="num">#02</span> Scratch</h3><video controls><source src="./scratch_project2.mp4"></video></div>
@@ -71,50 +72,58 @@ async function runModel() {
     const statusText = document.getElementById('status');
     const resultImg = document.getElementById('ai-res');
 
-    if (!promptInput) return alert("Введите описание!");
+    if (!promptInput) return alert("Введите описание на английском!");
 
     button.disabled = true;
-    statusText.innerText = "⏳ Модель загружается... Это займет около 40-60 секунд.";
+    button.innerText = "ГЕНЕРАЦИЯ...";
+    statusText.innerText = "⏳ Модель готовится... Это может занять около 30-60 секунд.";
     resultImg.style.display = "none";
 
-    // Прячем токен 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
-    const parts = ["hf_", "tucY", "FrsP", "Jtlh", "Aifp", "UlFP", "CtnS", "DbNO", "cwAR", "Cv"];
-    const apiToken = parts.join("");
+    // ВНИМАНИЕ: Вставь свой новый токен ниже
+    const apiToken = "hf_ЗДЕСЬ_ТВОЙ_НОВЫЙ_ТОКЕН"; 
 
     try {
         const response = await fetch(
             "https://api-inference.huggingface.co/models/shallowdream204/bitdance",
             {
-                headers: { Authorization: "Bearer " + apiToken },
+                headers: { 
+                    "Authorization": "Bearer " + apiToken,
+                    "Content-Type": "application/json" 
+                },
                 method: "POST",
                 body: JSON.stringify({ inputs: promptInput }),
             }
         );
 
+        // Обработка "прогревочного" состояния модели (код 503)
         if (response.status === 503) {
-            statusText.innerText = "🛰️ Модель просыпается. Нажмите кнопку еще раз через 30 секунд!";
+            const data = await response.json();
+            statusText.innerText = `🛰️ Модель просыпается... Попробуй через ${Math.round(data.estimated_time || 20)} сек.`;
             return;
         }
 
         if (!response.ok) {
-            statusText.innerText = "❌ Ошибка доступа. Токен был заблокирован GitHub.";
-            return;
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Ошибка доступа");
         }
 
         const blob = await response.blob();
         resultImg.src = URL.createObjectURL(blob);
         resultImg.style.display = "inline-block";
         statusText.innerText = "✅ Готово!";
+
     } catch (err) {
-        statusText.innerText = "❌ Ошибка соединения. Попробуйте снова.";
+        console.error(err);
+        statusText.innerText = "❌ Ошибка: " + err.message;
     } finally {
         button.disabled = false;
+        button.innerText = "СГЕНЕРИРОВАТЬ";
     }
 }
 </script>
 
 <footer style="padding: 40px; opacity: 0.5;">
-    <p>Связаться: <a href="https://t.me/Reason65" style="color: var(--neon);">Telegram</a></p>
+    <p>Связаться: <a href="https://t.me/Reason65" style="color: var(--neon); text-decoration: none;">Telegram</a></p>
 </footer>
 
 </body>
