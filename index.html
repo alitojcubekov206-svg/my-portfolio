@@ -49,13 +49,13 @@ async function runModel() {
         return;
     }
 
-    // Подготовка интерфейса
     button.disabled = true;
-    statusText.innerText = "⏳ Нейросеть генерирует... (около 10-15 сек)";
+    statusText.innerText = "⏳ Нейросеть генерирует... (около 15-20 сек)";
+    statusText.style.color = "#7c7cff";
     resultImg.style.display = "none";
 
-    // Твой актуальный токен
-    const apiToken = "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";
+    // Твой новый токен уже здесь
+    const apiToken = "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";
 
     try {
         const response = await fetch(
@@ -71,29 +71,28 @@ async function runModel() {
         );
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ error: "Ошибка сервера" }));
-            // Если модель еще загружается на сервер Hugging Face
+            const errorData = await response.json().catch(() => ({}));
             if (response.status === 503) {
-                throw new Error("Модель загружается. Попробуйте еще раз через 20 секунд.");
+                throw new Error("Модель загружается. Подожди 20 секунд и нажми кнопку еще раз.");
             }
-            throw new Error(errorData.error || `Ошибка API: ${response.status}`);
+            throw new Error(errorData.error || `Ошибка: ${response.status}`);
         }
 
         const blob = await response.blob();
-        
-        // Если вместо картинки пришел текст (редкая ошибка API)
-        if (blob.type.includes('json')) {
-            throw new Error("Не удалось получить изображение. Попробуйте другой запрос.");
+        if (!blob.type.includes('image')) {
+            throw new Error("Не удалось получить изображение. Попробуй другой запрос.");
         }
 
         const imageUrl = URL.createObjectURL(blob);
         resultImg.src = imageUrl;
         resultImg.style.display = "inline-block";
         statusText.innerText = "✅ Готово!";
+        statusText.style.color = "#00ff00";
 
     } catch (err) {
-        console.error("Детали ошибки:", err);
+        console.error("Ошибка:", err);
         statusText.innerText = "❌ " + err.message;
+        statusText.style.color = "#ff4c4c";
     } finally {
         button.disabled = false;
     }
