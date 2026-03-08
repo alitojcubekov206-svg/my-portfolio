@@ -50,37 +50,41 @@ async function runModel() {
     }
 
     button.disabled = true;
-    statusText.innerText = "⏳ Нейросеть генерирует... (около 15-20 сек)";
+    statusText.innerText = "⏳ Нейросеть генерирует через прокси... (15-30 сек)";
     statusText.style.color = "#7c7cff";
     resultImg.style.display = "none";
 
-    // Твой новый токен уже здесь
+    // Твой токен
     const apiToken = "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";
+    
+    // Ссылка с прокси для обхода CORS
+    const url = "https://cors-anywhere.herokuapp.com/https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
 
     try {
-        const response = await fetch(
-            "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
-            {
-                method: "POST",
-                headers: { 
-                    "Authorization": `Bearer ${apiToken.trim()}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ inputs: promptInput }),
-            }
-        );
+        const response = await fetch(url, {
+            method: "POST",
+            headers: { 
+                "Authorization": `Bearer ${apiToken.trim()}`,
+                "Content-Type": "application/json",
+                "X-Requested-With": "XMLHttpRequest"
+            },
+            body: JSON.stringify({ inputs: promptInput }),
+        });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            if (response.status === 503) {
-                throw new Error("Модель загружается. Подожди 20 секунд и нажми кнопку еще раз.");
+            if (response.status === 403) {
+                throw new Error("Нужно снова нажать кнопку на сайте cors-anywhere!");
             }
+            if (response.status === 503) {
+                throw new Error("Модель загружается. Подожди 30 секунд и нажми кнопку еще раз.");
+            }
+            const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.error || `Ошибка: ${response.status}`);
         }
 
         const blob = await response.blob();
         if (!blob.type.includes('image')) {
-            throw new Error("Не удалось получить изображение. Попробуй другой запрос.");
+            throw new Error("API вернуло не картинку. Попробуй другой запрос.");
         }
 
         const imageUrl = URL.createObjectURL(blob);
