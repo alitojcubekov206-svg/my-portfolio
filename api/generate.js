@@ -1,30 +1,34 @@
-const axios = require('axios');
+const https = require('https');
 
-export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Only POST allowed' });
-    }
+export default function handler(req, res) {
+    if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
-    const { prompt } = req.body;
-    const apiToken = process.env.HF_TOKEN;
+    const data = JSON.stringify({ inputs: req.body.prompt });
+    const options = {
+        hostname: 'api-inference.huggingface.co',
+        path: '/models/black-forest-labs/FLUX.1-schnell',
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${process.env.HF_TOKEN.trim()}`,
+            'Content-Type': 'application/json',
+            'Content-Length': data.length
+        }
+    };
 
-    try {
-        const response = await axios({
-            url: "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
-            method: 'POST',
-            headers: {
-                "Authorization": `Bearer ${apiToken.trim()}`,
-                "Content-Type": "application/json",
-            },
-            data: JSON.stringify({ inputs: prompt }),
-            responseType: 'arraybuffer',
+    const request = https.request(options, (response) => {
+        let chunks = [];
+        response.on('data', (chunk) => chunks.push(chunk));
+        response.on('end', () => {
+            const buffer = Buffer.concat(chunks);
+            if (response.statusCode !== 200) {
+                return res.status(response.statusCode).json({ error: 'HF Error' });
+            }
+            res.setHeader('Content-Type', 'image/jpeg');
+            res.send(buffer);
         });
+    });
 
-        res.setHeader('Content-Type', 'image/jpeg');
-        res.send(response.data);
-
-    } catch (error) {
-        console.error("Error details:", error.response ? error.response.data.toString() : error.message);
-        res.status(500).json({ error: "Ошибка нейросети. Проверь токен или попробуй позже." });
-    }
+    request.on('error', (e) => res.status(500).json({ error: e.message }));
+    request.write(data);
+    request.end();
 }
