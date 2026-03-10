@@ -51,47 +51,35 @@ async function runModel() {
         return;
     }
 
+    // Блокируем кнопку и показываем статус
     button.disabled = true;
-    statusText.innerText = "⏳ Нейросеть генерирует через прокси... (около 30 сек)";
+    statusText.innerText = "⏳ Нейросеть генерирует через Vercel... (15-30 сек)";
     statusText.style.color = "#7c7cff";
     resultImg.style.display = "none";
 
-    // Токен (hf_wsVC...)
-    const apiToken = "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";
-    
-    // Ссылка с прокси
-    const url = "https://cors-anywhere.herokuapp.com/https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
-
     try {
-        const response = await fetch(url, {
+        // Запрос идет к твоему новому серверному файлу /api/generate.js
+        const response = await fetch("/api/generate", {
             method: "POST",
-            headers: { 
-                "Authorization": "Bearer " + apiToken.trim(),
+            headers: {
                 "Content-Type": "application/json",
-                "X-Requested-With": "XMLHttpRequest"
             },
-            body: JSON.stringify({ inputs: promptInput }),
+            body: JSON.stringify({ prompt: promptInput }),
         });
 
         if (!response.ok) {
-            if (response.status === 403) {
-                throw new Error("Нужно нажать кнопку активации на сайте cors-anywhere!");
-            }
-            if (response.status === 401) {
-                throw new Error("Токен не подходит. Создай новый Token на Hugging Face.");
-            }
-            throw new Error(`Ошибка сервера: ${response.status}`);
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Ошибка сервера: ${response.status}`);
         }
 
+        // Получаем картинку как Blob
         const blob = await response.blob();
         
-        if (blob.size < 1000) {
-             throw new Error("Ошибка: получена пустая картинка. Попробуй еще раз.");
-        }
-
+        // Создаем временную ссылку на картинку и показываем её
         const imageUrl = URL.createObjectURL(blob);
         resultImg.src = imageUrl;
         resultImg.style.display = "block";
+        
         statusText.innerText = "✅ Готово!";
         statusText.style.color = "#00ff00";
 
@@ -100,6 +88,7 @@ async function runModel() {
         statusText.innerText = "❌ " + err.message;
         statusText.style.color = "#ff4c4c";
     } finally {
+        // Разблокируем кнопку в любом случае
         button.disabled = false;
     }
 }
