@@ -52,15 +52,14 @@ async function runModel() {
     }
 
     button.disabled = true;
-    statusText.innerText = "⏳ Нейросеть генерирует... (это может занять до 30 сек)";
+    statusText.innerText = "⏳ Нейросеть генерирует... (около 30 сек)";
     statusText.style.color = "#7c7cff";
     resultImg.style.display = "none";
 
-    // ПРОВЕРЬ: Твой новый токен должен быть здесь!
-    // Если этот токен hf_mndk... не работает, создай новый на Hugging Face и замени его ниже.
+    // Токен (Важно: если будет ошибка 401, создай новый токен на HF)
     const apiToken = "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";
     
-    // Новый рабочий URL без прокси
+    // Прямая ссылка без прокси
     const url = "https://router.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
 
     try {
@@ -77,20 +76,18 @@ async function runModel() {
             const errorData = await response.json().catch(() => ({}));
             
             if (response.status === 401) {
-                throw new Error("Ошибка токена! Создай новый токен на Hugging Face.");
+                throw new Error("Токен не подходит или удален. Создай новый на Hugging Face.");
             }
             if (response.status === 503) {
-                throw new Error("Модель просыпается. Попробуй еще раз через 20 секунд.");
+                throw new Error("Модель загружается. Нажми кнопку еще раз через 20-30 секунд.");
             }
-            
             throw new Error(errorData.error || `Ошибка: ${response.status}`);
         }
 
         const blob = await response.blob();
         
-        // Если API вернуло ошибку в виде JSON вместо картинки
-        if (blob.type === "application/json") {
-             throw new Error("Ошибка сервера. Попробуй позже.");
+        if (blob.type.includes("json")) {
+             throw new Error("Сервер вернул текст вместо картинки. Попробуй позже.");
         }
 
         const imageUrl = URL.createObjectURL(blob);
@@ -100,7 +97,7 @@ async function runModel() {
         statusText.style.color = "#00ff00";
 
     } catch (err) {
-        console.error("Ошибка:", err);
+        console.error("Детали ошибки:", err);
         statusText.innerText = "❌ " + err.message;
         statusText.style.color = "#ff4c4c";
     } finally {
