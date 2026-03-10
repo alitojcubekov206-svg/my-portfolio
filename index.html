@@ -33,7 +33,9 @@
         <br>
         <button onclick="runModel()" id="btn" class="ai-btn">СГЕНЕРИРОВАТЬ</button>
         <p id="status"></p>
-        <center><img id="ai-res" src="" alt="Результат генерации"></center>
+        <div style="display: flex; justify-content: center;">
+            <img id="ai-res" src="" alt="Результат генерации">
+        </div>
     </div>
 </section>
 
@@ -50,46 +52,50 @@ async function runModel() {
     }
 
     button.disabled = true;
-    statusText.innerText = "⏳ Нейросеть генерирует через прокси... (15-30 сек)";
+    statusText.innerText = "⏳ Нейросеть генерирует... (это может занять до 30 сек)";
     statusText.style.color = "#7c7cff";
     resultImg.style.display = "none";
 
-    // Твой токен
+    // ПРОВЕРЬ: Твой новый токен должен быть здесь!
+    // Если этот токен hf_mndk... не работает, создай новый на Hugging Face и замени его ниже.
     const apiToken = "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";
     
-    // Ссылка с прокси для обхода CORS
-    const url = "https://cors-anywhere.herokuapp.com/https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
+    // Новый рабочий URL без прокси
+    const url = "https://router.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
 
     try {
         const response = await fetch(url, {
             method: "POST",
             headers: { 
                 "Authorization": `Bearer ${apiToken.trim()}`,
-                "Content-Type": "application/json",
-                "X-Requested-With": "XMLHttpRequest"
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({ inputs: promptInput }),
         });
 
         if (!response.ok) {
-            if (response.status === 403) {
-                throw new Error("Нужно снова нажать кнопку на сайте cors-anywhere!");
+            const errorData = await response.json().catch(() => ({}));
+            
+            if (response.status === 401) {
+                throw new Error("Ошибка токена! Создай новый токен на Hugging Face.");
             }
             if (response.status === 503) {
-                throw new Error("Модель загружается. Подожди 30 секунд и нажми кнопку еще раз.");
+                throw new Error("Модель просыпается. Попробуй еще раз через 20 секунд.");
             }
-            const errorData = await response.json().catch(() => ({}));
+            
             throw new Error(errorData.error || `Ошибка: ${response.status}`);
         }
 
         const blob = await response.blob();
-        if (!blob.type.includes('image')) {
-            throw new Error("API вернуло не картинку. Попробуй другой запрос.");
+        
+        // Если API вернуло ошибку в виде JSON вместо картинки
+        if (blob.type === "application/json") {
+             throw new Error("Ошибка сервера. Попробуй позже.");
         }
 
         const imageUrl = URL.createObjectURL(blob);
         resultImg.src = imageUrl;
-        resultImg.style.display = "inline-block";
+        resultImg.style.display = "block";
         statusText.innerText = "✅ Готово!";
         statusText.style.color = "#00ff00";
 
