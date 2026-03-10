@@ -52,41 +52,43 @@ async function runModel() {
     }
 
     button.disabled = true;
-    statusText.innerText = "⏳ Нейросеть генерирует... (около 30 сек)";
+    statusText.innerText = "⏳ Нейросеть генерирует через прокси... (около 30 сек)";
     statusText.style.color = "#7c7cff";
     resultImg.style.display = "none";
 
-    // ВАЖНО: Если снова будет ошибка 401, создай НОВЫЙ токен на Hugging Face.
-    // Твой текущий токен может быть заблокирован из-за публикации в сети.
+    // Токен (hf_wsVC...)
     const apiToken = "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";
     
-    // ПРОВЕРЕННАЯ ССЫЛКА (без лишних знаков)
-    const url = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
+    // Ссылка с прокси
+    const url = "https://cors-anywhere.herokuapp.com/https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
 
     try {
         const response = await fetch(url, {
             method: "POST",
             headers: { 
                 "Authorization": "Bearer " + apiToken.trim(),
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "X-Requested-With": "XMLHttpRequest"
             },
             body: JSON.stringify({ inputs: promptInput }),
         });
 
         if (!response.ok) {
-            const errorText = await response.text();
-            console.log("Ответ сервера:", errorText);
-            
-            if (response.status === 404) {
-                throw new Error("Модель не найдена. Проверь URL в коде.");
+            if (response.status === 403) {
+                throw new Error("Нужно нажать кнопку активации на сайте cors-anywhere!");
             }
             if (response.status === 401) {
-                throw new Error("Токен недействителен. Создай новый Token (Read) на Hugging Face.");
+                throw new Error("Токен не подходит. Создай новый Token на Hugging Face.");
             }
-            throw new Error(`Ошибка: ${response.status}`);
+            throw new Error(`Ошибка сервера: ${response.status}`);
         }
 
         const blob = await response.blob();
+        
+        if (blob.size < 1000) {
+             throw new Error("Ошибка: получена пустая картинка. Попробуй еще раз.");
+        }
+
         const imageUrl = URL.createObjectURL(blob);
         resultImg.src = imageUrl;
         resultImg.style.display = "block";
