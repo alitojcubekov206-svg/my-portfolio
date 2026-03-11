@@ -7,8 +7,9 @@ export default async function handler(req, res) {
     const HF_TOKEN = process.env.HF_TOKEN;
 
     try {
+        // МЫ ЗАМЕНИЛИ АДРЕС НА НОВЫЙ (router.huggingface.co)
         const response = await fetch(
-            "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1",
+            "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-2-1",
             {
                 headers: { 
                     "Authorization": `Bearer ${HF_TOKEN}`,
@@ -21,7 +22,6 @@ export default async function handler(req, res) {
 
         if (!response.ok) {
             const errorData = await response.json();
-            // Если модель загружается, HF вернет ошибку с временем ожидания
             return res.status(response.status).json(errorData);
         }
 
