@@ -16,7 +16,7 @@
 
     <div class="max-w-2xl w-full text-center space-y-8">
         <h1 class="text-4xl font-bold tracking-tight text-indigo-400">Привет, я Али 👋</h1>
-        <p class="text-gray-400 text-lg text-white">Scratch Developer | AI Enthusiast</p>
+        <p class="text-gray-400 text-lg">Scratch Developer | AI Enthusiast</p>
 
         <div class="glass p-8 rounded-3xl shadow-2xl space-y-6">
             <h2 class="text-2xl font-semibold">AI Image Studio</h2>
@@ -36,20 +36,15 @@
             <div id="resultContainer" class="hidden mt-6 space-y-4">
                 <div id="loading" class="flex flex-col items-center space-y-2">
                     <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
-                    <p class="text-sm text-gray-400">Нейронка думает (это может занять до 30 сек)...</p>
+                    <p class="text-sm text-gray-400">Нейронка думает через Vercel...</p>
                 </div>
                 <img id="outputImage" class="hidden w-full rounded-2xl shadow-lg border border-gray-800" src="" alt="Generated">
-                <a id="downloadBtn" class="hidden inline-block text-indigo-400 hover:text-indigo-300 text-sm font-medium underline">Скачать результат</a>
+                <a id="downloadBtn" target="_blank" class="hidden inline-block text-indigo-400 hover:text-indigo-300 text-sm font-medium underline">Скачать результат</a>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        import { HfInference } from 'https://cdn.jsdelivr.net/npm/@huggingface/inference@2.6.4/+esm'
-
-        const HF_TOKEN = "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"; 
-        const hf = new HfInference(HF_TOKEN);
-
+    <script>
         const promptInput = document.getElementById('prompt');
         const btn = document.getElementById('genBtn');
         const resultCont = document.getElementById('resultContainer');
@@ -61,7 +56,6 @@
         btn.onclick = async () => {
             if (!promptInput.value) return alert("Введите запрос!");
 
-            // Сброс состояния
             btn.disabled = true;
             btn.innerText = "В ПРОЦЕССЕ...";
             errorBox.classList.add('hidden');
@@ -71,27 +65,30 @@
             downloadBtn.classList.add('hidden');
 
             try {
-                // Используем SDK вместо fetch
-                const blob = await hf.textToImage({
-                    model: 'stabilityai/stable-diffusion-2-1',
-                    inputs: promptInput.value,
+                // Теперь мы отправляем запрос на наш бэкенд Vercel
+                const response = await fetch("/api/generate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ prompt: promptInput.value }),
                 });
 
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || "Ошибка сервера");
+                }
+
+                const blob = await response.blob();
                 const objectUrl = URL.createObjectURL(blob);
                 
                 img.src = objectUrl;
                 img.classList.remove('hidden');
                 downloadBtn.href = objectUrl;
-                downloadBtn.download = "ai-image.png";
+                downloadBtn.download = "ai-image.jpg";
                 downloadBtn.classList.remove('hidden');
 
             } catch (err) {
-                console.error("Детали ошибки:", err);
-                let message = err.message;
-                if (message.includes("503")) {
-                    message = "Модель просыпается. Попробуй еще раз через 20 секунд.";
-                }
-                document.getElementById('errorMsg').innerText = message;
+                console.error("Ошибка:", err);
+                document.getElementById('errorMsg').innerText = "Проблема с сервером. Проверь настройки токена в Vercel.";
                 errorBox.classList.remove('hidden');
             } finally {
                 btn.disabled = false;
