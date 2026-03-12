@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Generator | FLUX.1</title>
+    <title>AI Image Generator | Secure Version</title>
     <style>
         :root {
             --primary: #8a2be2;
@@ -13,7 +13,7 @@
         }
 
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg);
             color: var(--text);
             display: flex;
@@ -34,13 +34,7 @@
             border: 1px solid #333;
         }
 
-        h1 { font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--primary); }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .input-group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
 
         input {
             padding: 14px;
@@ -48,11 +42,8 @@
             border: 1px solid #444;
             background: #2a2a35;
             color: white;
-            font-size: 1rem;
             outline: none;
         }
-
-        input:focus { border-color: var(--primary); }
 
         button {
             padding: 14px;
@@ -61,42 +52,27 @@
             background: var(--primary);
             color: white;
             font-weight: bold;
-            font-size: 1rem;
             cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
         }
 
-        button:hover { opacity: 0.9; transform: translateY(-2px); }
-        button:disabled { background: #555; cursor: not-allowed; transform: none; }
-
-        .loader {
-            display: none;
-            margin: 20px 0;
-            font-size: 0.9rem;
-            color: #aaa;
-        }
+        button:disabled { background: #555; }
 
         #result-container {
             margin-top: 20px;
-            min-height: 200px;
+            min-height: 250px;
+            border: 2px dashed #333;
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px dashed #333;
-            border-radius: 15px;
             overflow: hidden;
         }
 
-        #result-img {
-            width: 100%;
-            display: none;
-            animation: fadeIn 0.5s ease-in;
-        }
+        #result-img { width: 100%; display: none; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        .loader { display: none; margin: 15px; color: var(--primary); }
+        
+        .token-status { font-size: 10px; margin-top: 10px; color: #666; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -105,87 +81,81 @@
     <h1>Генератор FLUX.1</h1>
     
     <div class="input-group">
-        <input type="text" id="prompt" placeholder="Опиши картинку (на английском)..." autocomplete="off">
-        <button id="generate-btn">Создать шедевр</button>
+        <input type="text" id="prompt" placeholder="Опиши картинку (на англ)...">
+        <button id="gen-btn">Сгенерировать</button>
     </div>
 
-    <div id="loader" class="loader">✨ Нейросеть думает... Подождите немного</div>
+    <div id="loader" class="loader">🎨 Рисую... (ждем 15-20 сек)</div>
 
     <div id="result-container">
-        <span id="placeholder-text" style="color: #555;">Тут будет ваша картинка</span>
-        <img id="result-img" alt="Результат">
+        <span id="placeholder" style="color: #555;">Картинка появится здесь</span>
+        <img id="result-img">
     </div>
+
+    <div class="token-status" onclick="resetToken()">Сбросить API токен</div>
 </div>
 
 <script>
-    // 1. ВСТАВЬ СВОЙ ТОКЕН СЮДА (получи на huggingface.co)
-    const HF_TOKEN = "ЗДЕСЬ_ТВОЙ_ТОКЕН"; 
-    
-    // Используем одну из лучших быстрых моделей
-    const API_URL = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
+    // ПРОВЕРКА ТОКЕНА
+    let HF_TOKEN = localStorage.getItem('hf_api_token');
 
-    const promptInput = document.getElementById('prompt');
-    const genBtn = document.getElementById('generate-btn');
-    const loader = document.getElementById('loader');
-    const resultImg = document.getElementById('result-img');
-    const placeholder = document.getElementById('placeholder-text');
-
-    async function query(data) {
-        const response = await fetch(API_URL, {
-            headers: { 
-                Authorization: `Bearer ${HF_TOKEN}`,
-                "Content-Type": "application/json"
-            },
-            method: "POST",
-            body: JSON.stringify(data),
-        });
-
-        if (!response.ok) {
-            throw new Error("Ошибка API. Проверь токен или подожди минуту.");
+    if (!HF_TOKEN) {
+        HF_TOKEN = prompt("GitHub забанил прошлый токен. Создай НОВЫЙ на Hugging Face и вставь сюда:");
+        if (HF_TOKEN) {
+            localStorage.setItem('hf_api_token', HF_TOKEN);
         }
-
-        const result = await response.blob();
-        return result;
     }
 
-    genBtn.addEventListener('click', async () => {
-        const text = promptInput.value.trim();
-        
-        if (!text) {
-            alert("Пожалуйста, введи описание!");
-            return;
-        }
+    const API_URL = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell";
 
-        if (HF_TOKEN === "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") {
-            alert("Ты забыл вставить API токен в коде!");
-            return;
-        }
+    async function generate() {
+        const promptInput = document.getElementById('prompt');
+        const btn = document.getElementById('gen-btn');
+        const loader = document.getElementById('loader');
+        const resultImg = document.getElementById('result-img');
+        const placeholder = document.getElementById('placeholder');
 
-        // Состояние загрузки
-        genBtn.disabled = true;
+        if (!promptInput.value) return alert("Введите текст!");
+        if (!HF_TOKEN) return alert("Нужен токен!");
+
+        btn.disabled = true;
         loader.style.display = "block";
         resultImg.style.display = "none";
         placeholder.style.display = "none";
 
         try {
-            const blob = await query({ "inputs": text });
-            const imageUrl = URL.createObjectURL(blob);
-            
-            resultImg.src = imageUrl;
+            const response = await fetch(API_URL, {
+                headers: { 
+                    Authorization: `Bearer ${HF_TOKEN}`,
+                    "Content-Type": "application/json"
+                },
+                method: "POST",
+                body: JSON.stringify({ inputs: promptInput.value }),
+            });
+
+            if (response.status === 401) {
+                alert("Токен неверный или забанен. Нажми 'Сбросить' внизу и введи новый.");
+                throw new Error("401");
+            }
+
+            const blob = await response.blob();
+            resultImg.src = URL.createObjectURL(blob);
             resultImg.style.display = "block";
-        } catch (error) {
-            alert(error.message);
+        } catch (err) {
+            console.error(err);
             placeholder.style.display = "block";
         } finally {
-            genBtn.disabled = false;
+            btn.disabled = false;
             loader.style.display = "none";
         }
-    });
+    }
 
-    // Генерация по нажатию Enter
-    promptInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') genBtn.click();
-    });
+    document.getElementById('gen-btn').onclick = generate;
+
+    function resetToken() {
+        localStorage.removeItem('hf_api_token');
+        location.reload();
+    }
 </script>
 
 </body>
