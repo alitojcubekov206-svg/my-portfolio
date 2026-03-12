@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Studio 2.0</title>
+    <title>AI Image Studio - Ali</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0d0d12; color: white; font-family: 'Inter', sans-serif; }
@@ -16,83 +16,93 @@
 
     <div class="max-w-2xl w-full text-center space-y-8">
         <h1 class="text-4xl font-bold tracking-tight text-indigo-400">Привет, я Али 👋</h1>
-        <p class="text-gray-400 text-lg">Scratch Developer | AI Enthusiast</p>
+        
+        <div class="glass p-6 rounded-2xl mb-4">
+            <p class="text-xs text-gray-400 mb-2">Вставь свой токен (он сохранится в браузере):</p>
+            <input type="password" id="hfToken" placeholder="hf_..." 
+                class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-indigo-500">
+        </div>
 
         <div class="glass p-8 rounded-3xl shadow-2xl space-y-6">
             <h2 class="text-2xl font-semibold">AI Image Studio</h2>
-            
-            <div class="relative">
-                <input type="text" id="prompt" placeholder="Опиши картинку (на английском)..." 
-                    class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-white">
-            </div>
+            <input type="text" id="prompt" placeholder="Опиши картинку на английском..." 
+                class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white">
 
-            <button id="genBtn"
-                class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl transition-all transform active:scale-95">
+            <button id="genBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl transition-all active:scale-95">
                 СГЕНЕРИРОВАТЬ
             </button>
 
-            <div id="errorBox" class="hidden text-red-500 font-medium bg-red-500/10 p-4 rounded-xl">❌ Ошибка: <span id="errorMsg"></span></div>
+            <div id="status" class="mt-4 text-sm text-indigo-300"></div>
 
-            <div id="resultContainer" class="hidden mt-6 space-y-4">
+            <div id="resultContainer" class="hidden mt-6">
                 <div id="loading" class="flex flex-col items-center space-y-2">
                     <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
-                    <p class="text-sm text-gray-400">Нейронка думает через Vercel...</p>
+                    <p class="text-sm text-gray-400">Нейронка просыпается...</p>
                 </div>
-                <img id="outputImage" class="hidden w-full rounded-2xl shadow-lg border border-gray-800" src="" alt="Generated">
-                <a id="downloadBtn" target="_blank" class="hidden inline-block text-indigo-400 hover:text-indigo-300 text-sm font-medium underline">Скачать результат</a>
+                <img id="outputImage" class="hidden w-full rounded-2xl border border-gray-800 shadow-2xl" src="">
             </div>
         </div>
     </div>
 
     <script>
+        const tokenInput = document.getElementById('hfToken');
         const promptInput = document.getElementById('prompt');
         const btn = document.getElementById('genBtn');
-        const resultCont = document.getElementById('resultContainer');
+        const status = document.getElementById('status');
+        const resultContainer = document.getElementById('resultContainer');
         const loader = document.getElementById('loading');
         const img = document.getElementById('outputImage');
-        const errorBox = document.getElementById('errorBox');
-        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Подгружаем токен из памяти браузера
+        tokenInput.value = localStorage.getItem('user_hf_token') || '';
 
         btn.onclick = async () => {
-            if (!promptInput.value) return alert("Введите запрос!");
+            const token = tokenInput.value.trim();
+            const prompt = promptInput.value.trim();
+
+            if (!token) return alert("Вставь токен!");
+            if (!prompt) return alert("Напиши промпт!");
+
+            // Сохраняем токен, чтобы не вводить каждый раз
+            localStorage.setItem('user_hf_token', token);
 
             btn.disabled = true;
-            btn.innerText = "В ПРОЦЕССЕ...";
-            errorBox.classList.add('hidden');
-            resultCont.classList.remove('hidden');
+            status.innerText = "Отправляю запрос...";
+            resultContainer.classList.remove('hidden');
             loader.classList.remove('hidden');
             img.classList.add('hidden');
-            downloadBtn.classList.add('hidden');
 
             try {
-                // Теперь мы отправляем запрос на наш бэкенд Vercel
-                const response = await fetch("/api/generate", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ prompt: promptInput.value }),
-                });
+                const response = await fetch(
+                    "https://router.huggingface.co/hf-inference/models/runwayml/stable-diffusion-v1-5",
+                    {
+                        headers: { 
+                            "Authorization": `Bearer ${token}`,
+                            "Content-Type": "application/json" 
+                        },
+                        method: "POST",
+                        body: JSON.stringify({ inputs: prompt }),
+                    }
+                );
 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(errorText || "Ошибка сервера");
+                    const errorMsg = await response.text();
+                    if (response.status === 503) {
+                        status.innerText = "Модель загружается, подожди 20 сек и нажми еще раз.";
+                    } else {
+                        status.innerText = "Ошибка: " + response.status;
+                    }
+                    throw new Error(errorMsg);
                 }
 
                 const blob = await response.blob();
-                const objectUrl = URL.createObjectURL(blob);
-                
-                img.src = objectUrl;
+                img.src = URL.createObjectURL(blob);
                 img.classList.remove('hidden');
-                downloadBtn.href = objectUrl;
-                downloadBtn.download = "ai-image.jpg";
-                downloadBtn.classList.remove('hidden');
-
+                status.innerText = "Готово! 🔥";
             } catch (err) {
-                console.error("Ошибка:", err);
-                document.getElementById('errorMsg').innerText = "Проблема с сервером. Проверь настройки токена в Vercel.";
-                errorBox.classList.remove('hidden');
+                console.error(err);
             } finally {
                 btn.disabled = false;
-                btn.innerText = "СГЕНЕРИРОВАТЬ";
                 loader.classList.add('hidden');
             }
         };
