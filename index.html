@@ -3,85 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIdent2 Generator</title>
+    <title>AIdent2 Gen</title>
     <style>
-        body { font-family: sans-serif; background: #1a1a1a; color: white; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .container { background: #2a2a2a; padding: 30px; border-radius: 20px; text-align: center; width: 90%; max-width: 450px; }
-        h1 { color: #00d2ff; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 10px; border: none; background: #333; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; border: none; border-radius: 10px; background: #00d2ff; color: #1a1a1a; font-weight: bold; cursor: pointer; }
-        button:disabled { background: #555; }
-        #result { margin-top: 20px; width: 100%; border-radius: 10px; display: none; }
-        .loader { display: none; margin: 20px auto; border: 4px solid #333; border-top: 4px solid #00d2ff; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #status { margin-top: 15px; font-size: 14px; color: #aaa; }
+        body { margin: 0; background: #0f0f0f; color: #00d2ff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: #1a1a1a; padding: 30px; border-radius: 20px; border: 1px solid #333; text-align: center; width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 10px; border: 1px solid #444; background: #222; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 10px; background: #00d2ff; color: #000; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #00b0d4; transform: scale(1.02); }
+        button:disabled { background: #444; color: #888; cursor: not-allowed; }
+        #status { margin: 15px 0; font-size: 13px; color: #888; min-height: 1em; }
+        img { width: 100%; border-radius: 10px; margin-top: 15px; display: none; border: 1px solid #333; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>AIdent2 Gen</h1>
-    <input type="text" id="promptInput" placeholder="Опишите на английском (neon, space...)">
-    <button id="generateBtn">Сгенерировать</button>
-    <div class="loader" id="loader"></div>
+<div class="card">
+    <h2 style="margin-top:0">AIdent2 Gen</h2>
+    <input type="text" id="prompt" placeholder="Напиши на англ: neon cat...">
+    <button id="run">СГЕНЕРИРОВАТЬ</button>
     <div id="status"></div>
-    <img id="result" src="" alt="">
+    <img id="output" src="">
 </div>
 
 <script>
-    // 1. ВСТАВЬ ХВОСТ ТОКЕНА ТУТ (БЕЗ hf_)
+    // ВСТАВЬ ТОКЕН ТУТ:
     const p1 = "hf_";
     const p2 = "lNcmBMcDDcKYibgSndoXCtPUovSWGzNsyv"; 
-    const token = p1 + p2;
+    const secret = p1 + p2;
 
-    const modelId = "stabilityai/stable-diffusion-xl-base-1.0";
-
-    const btn = document.getElementById('generateBtn');
-    const input = document.getElementById('promptInput');
-    const resultImg = document.getElementById('result');
-    const loader = document.getElementById('loader');
+    const btn = document.getElementById('run');
     const status = document.getElementById('status');
+    const image = document.getElementById('output');
 
-    async function query(data) {
-        const response = await fetch(
-            `https://api-inference.huggingface.co/models/${modelId}`,
-            {
+    btn.onclick = async () => {
+        const text = document.getElementById('prompt').value.trim();
+        if (!text) return alert("Введите описание!");
+
+        btn.disabled = true;
+        image.style.display = "none";
+        status.innerText = "Запрос отправлен. Ждем...";
+
+        try {
+            const response = await fetch("https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0", {
                 headers: { 
-                    "Authorization": `Bearer ${token}`,
+                    "Authorization": `Bearer ${secret}`,
                     "Content-Type": "application/json"
                 },
                 method: "POST",
-                body: JSON.stringify(data),
+                body: JSON.stringify({ inputs: text }),
+            });
+
+            if (!response.ok) {
+                if (response.status === 503) throw new Error("Модель грузится... Жми еще раз через 20 сек.");
+                throw new Error("Ошибка. Проверь токен.");
             }
-        );
-        
-        if (!response.ok) {
-            throw new Error("Модель грузится... Жмите еще раз через 20 сек.");
-        }
-        return await response.blob();
-    }
 
-    btn.addEventListener('click', async () => {
-        const text = input.value.trim();
-        if (!text) return alert("Пусто!");
-
-        btn.disabled = true;
-        loader.style.display = "block";
-        resultImg.style.display = "none";
-        status.innerText = "Рисую...";
-
-        try {
-            const blob = await query({ "inputs": text });
-            resultImg.src = URL.createObjectURL(blob);
-            resultImg.style.display = "block";
+            const blob = await response.blob();
+            image.src = URL.createObjectURL(blob);
+            image.style.display = "block";
             status.innerText = "Готово!";
-        } catch (err) {
-            status.innerText = err.message;
+        } catch (e) {
+            status.innerText = e.message;
+            console.error(e);
         } finally {
             btn.disabled = false;
-            loader.style.display = "none";
         }
-    });
+    };
 </script>
 
 </body>
