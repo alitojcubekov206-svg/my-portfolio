@@ -2,96 +2,84 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>AI Studio - Ali</title>
+    <title>AI Image Studio - Ali</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0d0d12; color: white; font-family: sans-serif; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .loader { border-top-color: #6366f1; animation: spinner 1.5s linear infinite; }
-        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #6366f1; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
 
-    <div class="max-w-2xl w-full text-center space-y-8">
-        <h1 class="text-4xl font-bold tracking-tight text-indigo-400">Привет, я Али 👋</h1>
+    <div class="max-w-md w-full glass p-8 rounded-3xl shadow-2xl space-y-6">
+        <h1 class="text-3xl font-bold text-center text-indigo-400">AI Studio 👋</h1>
         
-        <div class="glass p-6 rounded-2xl mb-4">
-            <p class="text-xs text-gray-400 mb-2 font-mono">HF Token (saved in browser):</p>
-            <input type="password" id="hfToken" placeholder="hf_..." 
-                class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-indigo-500">
+        <div>
+            <label class="text-xs text-gray-400">HF Token:</label>
+            <input type="password" id="token" class="w-full bg-black/50 border border-gray-700 rounded-lg px-3 py-2 text-white mt-1">
         </div>
 
-        <div class="glass p-8 rounded-3xl shadow-2xl space-y-6 border-indigo-500/20 border">
-            <h2 class="text-2xl font-semibold">AI Image Studio</h2>
-            <input type="text" id="prompt" placeholder="Describe your image in English..." 
-                class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white">
+        <input type="text" id="prompt" placeholder="Describe image (English)" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-4 text-white">
 
-            <button id="genBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl transition-all active:scale-95 shadow-lg shadow-indigo-500/20">
-                СГЕНЕРИРОВАТЬ
-            </button>
+        <button id="btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl transition-all">
+            СГЕНЕРИРОВАТЬ
+        </button>
 
-            <div id="status" class="mt-4 text-sm text-indigo-300 font-medium"></div>
-
-            <div id="resultContainer" class="hidden mt-6 flex flex-col items-center">
-                <div id="loading" class="flex flex-col items-center space-y-2 mb-4">
-                    <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
-                    <p class="text-sm text-gray-400">Нейронка создает шедевр...</p>
-                </div>
-                <img id="outputImage" class="hidden w-full rounded-2xl border-2 border-indigo-500/30 shadow-2xl" src="">
-            </div>
-        </div>
+        <div id="status" class="text-center text-sm text-gray-400"></div>
+        <div id="loading" class="hidden flex justify-center"><div class="loader"></div></div>
+        <img id="output" class="hidden w-full rounded-xl border border-gray-700 mt-4 shadow-2xl">
     </div>
 
-    <script type="module">
-        // Используем официальную библиотеку, чтобы обойти CORS
-        import { HfInference } from 'https://cdn.jsdelivr.net/npm/@huggingface/inference@2.6.4/+esm'
-
-        const tokenInput = document.getElementById('hfToken');
-        const promptInput = document.getElementById('prompt');
-        const btn = document.getElementById('genBtn');
+    <script>
+        const btn = document.getElementById('btn');
+        const tokenInp = document.getElementById('token');
+        const promptInp = document.getElementById('prompt');
         const status = document.getElementById('status');
-        const resultContainer = document.getElementById('resultContainer');
-        const loader = document.getElementById('loading');
-        const img = document.getElementById('outputImage');
+        const output = document.getElementById('output');
+        const loading = document.getElementById('loading');
 
-        tokenInput.value = localStorage.getItem('user_hf_token') || '';
+        tokenInp.value = localStorage.getItem('hf_token_ali') || '';
 
         btn.onclick = async () => {
-            const token = tokenInput.value.trim();
-            const prompt = promptInput.value.trim();
+            const token = tokenInp.value.trim();
+            const prompt = promptInp.value.trim();
+            if (!token || !prompt) return alert("Заполни поля!");
 
-            if (!token) return alert("Вставь токен!");
-            if (!prompt) return alert("Напиши промпт!");
-
-            localStorage.setItem('user_hf_token', token);
-            const hf = new HfInference(token);
-
+            localStorage.setItem('hf_token_ali', token);
             btn.disabled = true;
-            status.innerText = "Связь с сервером установлена...";
-            resultContainer.classList.remove('hidden');
-            loader.classList.remove('hidden');
-            img.classList.add('hidden');
+            status.innerText = "Генерирую... (до 30 сек)";
+            loading.classList.remove('hidden');
+            output.classList.add('hidden');
 
             try {
-                const blob = await hf.textToImage({
-                    model: 'runwayml/stable-diffusion-v1-5',
-                    inputs: prompt,
+                // Используем модель, которая почти всегда онлайн
+                const modelUrl = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0";
+                
+                const response = await fetch(modelUrl, {
+                    headers: { "Authorization": `Bearer ${token}` },
+                    method: "POST",
+                    body: JSON.stringify({ inputs: prompt }),
                 });
 
-                img.src = URL.createObjectURL(blob);
-                img.classList.remove('hidden');
-                status.innerText = "Готово! 🔥";
-            } catch (err) {
-                console.error(err);
-                if (err.message.includes('503')) {
-                    status.innerText = "Модель просыпается. Нажми кнопку еще раз через 20 секунд.";
+                if (response.status === 503) {
+                    status.innerText = "Модель грузится. Подожди 15 сек и нажми еще раз.";
+                } else if (!response.ok) {
+                    const err = await response.json();
+                    status.innerText = "Ошибка: " + (err.error || response.status);
                 } else {
-                    status.innerText = "Ошибка: Проверь токен (должен быть тип Read).";
+                    const blob = await response.blob();
+                    output.src = URL.createObjectURL(blob);
+                    output.classList.remove('hidden');
+                    status.innerText = "Готово! 🔥";
                 }
+            } catch (e) {
+                status.innerText = "Ошибка сети. Проверь интернет.";
+                console.error(e);
             } finally {
                 btn.disabled = false;
-                loader.classList.add('hidden');
+                loading.classList.add('hidden');
             }
         };
     </script>
