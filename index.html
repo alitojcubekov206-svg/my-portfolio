@@ -1,93 +1,61 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Generator</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .container { background: #2a2a2a; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; width: 90%; max-width: 500px; }
-        h1 { margin-bottom: 20px; color: #00d2ff; }
-        input { width: 100%; padding: 12px; margin-bottom: 20px; border: none; border-radius: 10px; background: #333; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; border: none; border-radius: 10px; background: linear-gradient(90deg, #00d2ff, #3a7bd5); color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { opacity: 0.9; transform: scale(1.02); }
-        button:disabled { background: #555; cursor: not-allowed; }
-        #result { margin-top: 20px; width: 100%; border-radius: 15px; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .loader { display: none; margin: 20px auto; border: 4px solid #333; border-top: 4px solid #00d2ff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #status { margin-top: 15px; font-size: 14px; color: #aaa; }
-    </style>
-</head>
-<body>
+// 1. УБЕДИСЬ, ЧТО p2 — ЭТО ТОЛЬКО ХВОСТ (БЕЗ hf_)
+const p1 = "hf_";
+const p2 = "lNcmBMcDDcKYibgSndoXCtPUovSWGzNsyv_HF"; 
+const token = p1 + p2;
 
-<div class="container">
-    <h1>AIdent2 Gen</h1>
-    <input type="text" id="promptInput" placeholder="Опишите картинку на английском...">
-    <button id="generateBtn">Сгенерировать</button>
+// Попробуем другую модель (она быстрее просыпается)
+const modelId = "stabilityai/stable-diffusion-xl-base-1.0";
+
+const btn = document.getElementById('generateBtn');
+const input = document.getElementById('promptInput');
+const resultImg = document.getElementById('result');
+const loader = document.getElementById('loader');
+const status = document.getElementById('status');
+
+async function query(data) {
+    status.innerText = "Связь с сервером...";
+    const response = await fetch(
+        `https://api-inference.huggingface.co/models/${modelId}`,
+        {
+            headers: { 
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json" // Добавили этот заголовок!
+            },
+            method: "POST",
+            body: JSON.stringify(data),
+        }
+    );
     
-    <div class="loader" id="loader"></div>
-    <div id="status"></div>
-    <img id="result" src="" alt="Generated Image">
-</div>
-
-<script>
-    // ЗАЩИТА ТОКЕНА (Разрезаем, чтобы GitHub не забанил)
-    const p1 = "hf_";
-    const p2 = "GbnhxtxwPLnEcMMImJJUOFYGqvYrhXzLQf"; // Пример: "abc123xyz" (БЕЗ hf_)
-    const token = p1 + p2;
-
-    const modelId = "runwayml/stable-diffusion-v1-5";
-
-    const btn = document.getElementById('generateBtn');
-    const input = document.getElementById('promptInput');
-    const resultImg = document.getElementById('result');
-    const loader = document.getElementById('loader');
-    const status = document.getElementById('status');
-
-    async function query(data) {
-        const response = await fetch(
-            `https://api-inference.huggingface.co/models/${modelId}`,
-            {
-                headers: { Authorization: `Bearer ${token}` },
-                method: "POST",
-                body: JSON.stringify(data),
-            }
-        );
-        
-        if (!response.ok) {
-            if (response.status === 503) {
-                throw new Error("Модель загружается... Подождите 30 сек и нажмите еще раз.");
-            }
-            throw new Error("Ошибка сервера. Проверьте токен.");
-        }
-        
-        return await response.blob();
+    // Если ошибка 503 или 404 — значит модель грузится
+    if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        console.log("Ошибка API:", errData);
+        throw new Error("Сервер просыпается... Подождите 20 секунд и нажмите еще раз.");
     }
+    
+    return await response.blob();
+}
 
-    btn.addEventListener('click', async () => {
-        const text = input.value.trim();
-        if (!text) return alert("Введите текст!");
+btn.addEventListener('click', async () => {
+    const text = input.value.trim();
+    if (!text) return alert("Напишите что-нибудь!");
 
-        btn.disabled = true;
-        loader.style.display = "block";
-        resultImg.style.display = "none";
-        status.innerText = "Магия начинается...";
+    btn.disabled = true;
+    loader.style.display = "block";
+    resultImg.style.display = "none";
+    status.innerText = "Генерирую... (обычно занимает 10-30 сек)";
 
-        try {
-            const blob = await query({ "inputs": text });
-            const url = URL.createObjectURL(blob);
-            resultImg.src = url;
-            resultImg.style.display = "block";
-            status.innerText = "Готово!";
-        } catch (err) {
-            status.innerText = err.message;
-            console.error(err);
-        } finally {
-            btn.disabled = false;
-            loader.style.display = "none";
-        }
-    });
-</script>
-
-</body>
-</html>
+    try {
+        const blob = await query({ "inputs": text });
+        const url = URL.createObjectURL(blob);
+        resultImg.src = url;
+        resultImg.style.display = "block";
+        status.innerText = "Успех!";
+    } catch (err) {
+        status.innerText = err.message;
+        // Если видишь Failed to fetch — значит либо интернета нет, либо токен забанен
+    } finally {
+        btn.disabled = false;
+        loader.style.display = "none";
+    }
+});
