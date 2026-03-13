@@ -4,28 +4,60 @@
     <meta charset="UTF-8">
     <title>AIdent2 Gen — Multi AI</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background: #0b0b0b; font-family: sans-serif; overflow: hidden; }
-        .nav { height: 50px; background: #151515; display: flex; align-items: center; justify-content: center; gap: 20px; border-bottom: 1px solid #333; }
-        .nav button { background: #00d2ff; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .nav button:hover { opacity: 0.8; }
-        iframe { width: 100%; height: calc(100vh - 50px); border: none; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #0b0b0b; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
+        .nav { height: 60px; background: #151515; display: flex; align-items: center; justify-content: center; gap: 15px; border-bottom: 1px solid #333; }
+        .nav span { color: #888; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .nav button { background: #00d2ff; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s; color: #000; }
+        .nav button:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4); }
+        .nav button.active { background: #ffffff; outline: 2px solid #00d2ff; }
+        iframe { width: 100%; height: calc(100vh - 60px); border: none; background: #0b0b0b; }
+        
+        /* Индикатор загрузки для презентации */
+        #status { color: #00ff88; font-size: 12px; margin-left: 10px; font-family: monospace; }
     </style>
 </head>
 <body>
 
 <div class="nav">
-    <span style="color: white; font-size: 14px;">Выбор модели:</span>
-    <button onclick="changeModel('https://shallowdream204-bitdance-14b-64x.hf.space')">BitDance (NEW)</button>
-    <button onclick="changeModel('https://black-forest-labs-flux-1-schnell.hf.space')">Flux (Быстрая)</button>
-    <button onclick="changeModel('https://stabilityai-stable-diffusion-3-medium.hf.space')">SD 3.0</button>
+    <span>Выбор модели:</span>
+    <button id="btn-0" onclick="changeModel(0)">BitDance (NEW)</button>
+    <button id="btn-1" onclick="changeModel(1)">Flux (Быстрая)</button>
+    <button id="btn-2" onclick="changeModel(2)">SD 3.0</button>
+    <div id="status">Сервер: подключение...</div>
 </div>
 
-<iframe id="ai-frame" src="https://shallowdream204-bitdance-14b-64x.hf.space"></iframe>
+<iframe id="ai-frame" src=""></iframe>
 
 <script>
-    function changeModel(url) {
-        document.getElementById('ai-frame').src = url;
+    // Список твоих моделей
+    const models = [
+        'https://shallowdream204-bitdance-14b-64x.hf.space',
+        'https://black-forest-labs-flux-1-schnell.hf.space',
+        'https://stabilityai-stable-diffusion-3-medium.hf.space'
+    ];
+
+    const frame = document.getElementById('ai-frame');
+    const statusText = document.getElementById('status');
+
+    function changeModel(index) {
+        // Меняем URL фрейма
+        frame.src = models[index];
+        
+        // Визуально подсвечиваем активную кнопку
+        document.querySelectorAll('.nav button').forEach((btn, i) => {
+            btn.classList.toggle('active', i === index);
+        });
+        
+        statusText.innerText = `Сервер: #${index + 1} активен`;
     }
+
+    // ЛОГИКА ДЛЯ ПРЕЗЕНТАЦИИ:
+    // При загрузке страницы выбираем СЛУЧАЙНУЮ модель из списка
+    window.onload = function() {
+        const randomIndex = Math.floor(Math.random() * models.length);
+        changeModel(randomIndex);
+        console.log("Авто-балансировка: выбрана модель №" + (randomIndex + 1));
+    };
 </script>
 
 </body>
