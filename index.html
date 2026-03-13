@@ -1,69 +1,201 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>AI Generator</title>
+    <title>AIdent2 Gen — AI Generator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { background: #111; color: #00d2ff; font-family: sans-serif; text-align: center; padding: 20px; }
-        .box { max-width: 400px; margin: auto; background: #222; padding: 20px; border-radius: 15px; border: 1px solid #00d2ff; }
-        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 8px; border: none; }
-        button { width: 95%; padding: 12px; background: #00d2ff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        button:disabled { background: #444; }
-        img { width: 100%; margin-top: 20px; border-radius: 10px; display: none; }
-        #log { font-size: 12px; color: #888; margin-top: 10px; }
+        :root {
+            --primary: #00d2ff;
+            --bg: #111;
+            --card-bg: #1e1e1e;
+            --text: #e0e0e0;
+        }
+
+        body { 
+            background: var(--bg); 
+            color: var(--primary); 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .box { 
+            width: 100%;
+            max-width: 420px; 
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h2 { margin-bottom: 20px; letter-spacing: 1px; }
+
+        .input-group { margin-bottom: 15px; }
+
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            box-sizing: border-box;
+            border-radius: 10px; 
+            border: 1px solid #333; 
+            background: #252525;
+            color: white;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        input:focus { border-color: var(--primary); }
+
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            background: var(--primary); 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: bold; 
+            color: #000;
+            cursor: pointer; 
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        button:active { transform: translateY(1px); }
+        button:disabled { background: #444; color: #888; cursor: not-allowed; }
+
+        #result-wrapper {
+            margin-top: 20px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed #333;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        img { width: 100%; height: auto; display: none; }
+
+        #log { 
+            font-size: 13px; 
+            color: #888; 
+            margin-top: 15px; 
+            min-height: 1.2em;
+        }
+
+        /* Простой лоадер */
+        .loader {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #333;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div class="box">
     <h2>AIdent2 Gen</h2>
-    <input type="text" id="prompt" placeholder="Напиши: neon astronaut">
+    
+    <div class="input-group">
+        <input type="text" id="prompt" placeholder="Напиши: neon astronaut cyberpunk" autocomplete="off">
+    </div>
+    
     <button id="btn">ГЕНЕРИРОВАТЬ</button>
-    <div id="log"></div>
-    <img id="res">
+    
+    <div id="log">Введите запрос и нажмите кнопку</div>
+
+    <div id="result-wrapper">
+        <div class="loader" id="loader"></div>
+        <img id="res" alt="Generated AI content">
+    </div>
 </div>
 
 <script type="module">
     import { HfInference } from 'https://cdn.jsdelivr.net/npm/@huggingface/inference@2.6.4/+esm';
 
-    // ВСТАВЬ ТОКЕН ТУТ (разрезаем для защиты от бота GitHub)
-    const p1 = "hf_";
-    const p2 = "lNcmBMcDDcKYibgSndoXCtPUovSWGzNsyv"; 
-    const hf = new HfInference(p1 + p2);
+    // Константы
+    const HF_TOKEN = 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"; 
+    const MODEL = 'stabilityai/stable-diffusion-xl-base-1.0';
+
+    const hf = new HfInference(HF_TOKEN);
 
     const btn = document.getElementById('btn');
     const log = document.getElementById('log');
     const res = document.getElementById('res');
+    const loader = document.getElementById('loader');
+    const promptInput = document.getElementById('prompt');
 
-    btn.onclick = async () => {
-        const text = document.getElementById('prompt').value;
-        if (!text) return;
+    let currentImageUrl = null;
 
+    async function generateImage() {
+        const text = promptInput.value.trim();
+        if (!text) {
+            log.innerText = "⚠️ Пожалуйста, введите описание.";
+            return;
+        }
+
+        // Подготовка UI
         btn.disabled = true;
-        log.innerText = "Связь с нейросетью...";
+        log.innerText = "🧠 Нейросеть думает...";
+        loader.style.display = "block";
         res.style.display = "none";
+
+        // Очистка памяти от предыдущей картинки
+        if (currentImageUrl) {
+            URL.revokeObjectURL(currentImageUrl);
+        }
 
         try {
             const blob = await hf.textToImage({
-                model: 'stabilityai/stable-diffusion-xl-base-1.0',
+                model: MODEL,
                 inputs: text,
+                parameters: {
+                    negative_prompt: "blurry, bad quality, distorted",
+                }
             });
 
-            res.src = URL.createObjectURL(blob);
-            res.style.display = "block";
-            log.innerText = "Готово!";
+            currentImageUrl = URL.createObjectURL(blob);
+            res.src = currentImageUrl;
+            
+            res.onload = () => {
+                res.style.display = "block";
+                loader.style.display = "none";
+                log.innerText = "✨ Готово!";
+            };
+
         } catch (err) {
-            console.error(err);
+            console.error("HF Error:", err);
+            loader.style.display = "none";
+            
             if (err.message.includes("503")) {
-                log.innerText = "Модель просыпается. Подожди 15 сек и нажми еще раз.";
+                log.innerText = "⏳ Модель загружается (503). Попробуйте через 20 секунд.";
+            } else if (err.message.includes("401")) {
+                log.innerText = "❌ Ошибка: Неверный API токен.";
             } else {
-                log.innerText = "Ошибка: " + err.message;
+                log.innerText = "❌ Ошибка: " + err.message;
             }
         } finally {
             btn.disabled = false;
         }
-    };
+    }
+
+    btn.addEventListener('click', generateImage);
+
+    // Генерация по нажатию Enter
+    promptInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') generateImage();
+    });
 </script>
 </body>
 </html>
