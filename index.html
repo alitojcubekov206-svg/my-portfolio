@@ -2,97 +2,31 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>AIdent2 Gen — AI Studio</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIdent2 Gen — Multi AI</title>
     <style>
-        :root { --primary: #00d2ff; --bg: #0b0b0b; --card: #151515; }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .box { width: 90%; max-width: 400px; background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid #333; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h2 { color: var(--primary); margin-bottom: 20px; letter-spacing: 1px; }
-        input { width: 100%; padding: 15px; box-sizing: border-box; border-radius: 10px; border: 1px solid #333; background: #222; color: #fff; margin-bottom: 15px; outline: none; }
-        button { width: 100%; padding: 15px; background: var(--primary); border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; color: #000; }
-        button:disabled { background: #444; color: #888; }
-        #result-wrapper { margin-top: 20px; min-height: 250px; display: flex; align-items: center; justify-content: center; background: #000; border-radius: 12px; border: 1px dashed #444; }
-        img { width: 100%; display: none; border-radius: 10px; }
-        #log { font-size: 13px; color: #777; margin-top: 15px; }
-        .loader { width: 30px; height: 30px; border: 3px solid #333; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; display: none; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        body, html { margin: 0; padding: 0; height: 100%; background: #0b0b0b; font-family: sans-serif; overflow: hidden; }
+        .nav { height: 50px; background: #151515; display: flex; align-items: center; justify-content: center; gap: 20px; border-bottom: 1px solid #333; }
+        .nav button { background: #00d2ff; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .nav button:hover { opacity: 0.8; }
+        iframe { width: 100%; height: calc(100vh - 50px); border: none; }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h2>AIdent2 Gen</h2>
-    <input type="text" id="prompt" placeholder="Опишите картинку на английском..." autocomplete="off">
-    <button id="btn">ГЕНЕРИРОВАТЬ</button>
-    <div id="log">Готов к созданию</div>
-    <div id="result-wrapper">
-        <div class="loader" id="loader"></div>
-        <img id="res">
-    </div>
+<div class="nav">
+    <span style="color: white; font-size: 14px;">Выбор модели:</span>
+    <button onclick="changeModel('https://shallowdream204-bitdance-14b-64x.hf.space')">BitDance (NEW)</button>
+    <button onclick="changeModel('https://black-forest-labs-flux-1-schnell.hf.space')">Flux (Быстрая)</button>
+    <button onclick="changeModel('https://stabilityai-stable-diffusion-3-medium.hf.space')">SD 3.0</button>
 </div>
 
-<script type="module">
-    import { HfInference } from 'https://cdn.jsdelivr.net/npm/@huggingface/inference@2.6.4/+esm';
+<iframe id="ai-frame" src="https://shallowdream204-bitdance-14b-64x.hf.space"></iframe>
 
-    // Твой токен, разбитый на части для защиты от GitHub бота
-    const secrets = [
-        "hf_" + "kSPftshnKW" + "AnjWPowMkNb" + "YXhAvfjlwzjzq" 
-        // Если создашь второй аккаунт, добавь сюда второй токен так же через запятую
-    ];
-    
-    let currentKeyIndex = 0;
-
-    const btn = document.getElementById('btn');
-    const log = document.getElementById('log');
-    const res = document.getElementById('res');
-    const loader = document.getElementById('loader');
-    const promptInput = document.getElementById('prompt');
-
-    async function generate() {
-        const text = promptInput.value.trim();
-        if (!text) return;
-
-        btn.disabled = true;
-        loader.style.display = "block";
-        res.style.display = "none";
-        log.innerText = "⏳ Нейросеть рисует...";
-
-        try {
-            const hf = new HfInference(secrets[currentKeyIndex]);
-            
-            const blob = await hf.textToImage({
-                model: 'stabilityai/stable-diffusion-2-1',
-                inputs: text + ", high quality, cinematic lighting",
-                parameters: { negative_prompt: "ugly, blurry, low quality" }
-            });
-
-            const url = URL.createObjectURL(blob);
-            res.src = url;
-            res.onload = () => {
-                res.style.display = "block";
-                loader.style.display = "none";
-                log.innerText = "✨ Готово!";
-            };
-        } catch (err) {
-            console.error(err);
-            
-            // Если лимит исчерпан и есть другой токен — пробуем его
-            if (err.message.includes("429") && currentKeyIndex < secrets.length - 1) {
-                currentKeyIndex++;
-                log.innerText = "Смена линии связи...";
-                return generate();
-            }
-
-            loader.style.display = "none";
-            log.innerText = "❌ Ошибка лимита. Попробуйте позже.";
-        } finally {
-            btn.disabled = false;
-        }
+<script>
+    function changeModel(url) {
+        document.getElementById('ai-frame').src = url;
     }
-
-    btn.onclick = generate;
-    promptInput.onkeydown = (e) => { if (e.key === 'Enter') generate(); };
 </script>
+
 </body>
 </html>
