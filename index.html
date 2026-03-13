@@ -2,61 +2,104 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>AIdent2 Gen — Multi AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIdent2 Gen — Multi AI Portfolio</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background: #0b0b0b; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
-        .nav { height: 60px; background: #151515; display: flex; align-items: center; justify-content: center; gap: 15px; border-bottom: 1px solid #333; }
-        .nav span { color: #888; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
-        .nav button { background: #00d2ff; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s; color: #000; }
-        .nav button:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4); }
-        .nav button.active { background: #ffffff; outline: 2px solid #00d2ff; }
-        iframe { width: 100%; height: calc(100vh - 60px); border: none; background: #0b0b0b; }
-        
-        /* Индикатор загрузки для презентации */
-        #status { color: #00ff88; font-size: 12px; margin-left: 10px; font-family: monospace; }
+        /* Темная стильная тема */
+        body, html { 
+            margin: 0; padding: 0; height: 100%; 
+            background: #0b0b0b; color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            overflow: hidden; 
+        }
+
+        .nav { 
+            height: 60px; background: #1a1a1a; 
+            display: flex; align-items: center; justify-content: center; 
+            gap: 12px; border-bottom: 2px solid #333;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            z-index: 100; position: relative;
+        }
+
+        .nav span { font-size: 13px; color: #888; text-transform: uppercase; font-weight: bold; }
+
+        .nav button { 
+            background: #222; border: 1px solid #444; color: #ccc;
+            padding: 8px 16px; border-radius: 6px; cursor: pointer; 
+            font-weight: 600; transition: all 0.3s ease;
+        }
+
+        .nav button:hover { background: #333; border-color: #00d2ff; color: white; }
+
+        /* Стиль для активной кнопки */
+        .nav button.active { 
+            background: #00d2ff; color: #000; border-color: #00d2ff;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
+        }
+
+        #status-dot {
+            width: 8px; height: 8px; background: #00ff88;
+            border-radius: 50%; margin-left: 10px;
+            box-shadow: 0 0 8px #00ff88;
+        }
+
+        iframe { 
+            width: 100%; height: calc(100vh - 60px); 
+            border: none; background: #0b0b0b; 
+        }
+
+        /* Адаптивность для мобилок (если кто-то зайдет с телефона) */
+        @media (max-width: 600px) {
+            .nav span { display: none; }
+            .nav button { padding: 5px 10px; font-size: 12px; }
+        }
     </style>
 </head>
 <body>
 
 <div class="nav">
-    <span>Выбор модели:</span>
-    <button id="btn-0" onclick="changeModel(0)">BitDance (NEW)</button>
-    <button id="btn-1" onclick="changeModel(1)">Flux (Быстрая)</button>
-    <button id="btn-2" onclick="changeModel(2)">SD 3.0</button>
-    <div id="status">Сервер: подключение...</div>
+    <span>AI Модели:</span>
+    <button id="btn-0" onclick="changeModel(0)">BitDance</button>
+    <button id="btn-1" onclick="changeModel(1)">Flux (Schnell)</button>
+    <button id="btn-2" onclick="changeModel(2)">RealVis XL</button>
+    <div id="status-dot" title="Система готова"></div>
 </div>
 
-<iframe id="ai-frame" src=""></iframe>
+<iframe id="ai-frame" src="about:blank" allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking" sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-today-data-delivery-format-allow-downloads"></iframe>
 
 <script>
-    // Список твоих моделей
+    // Список максимально стабильных ссылок на данный момент
     const models = [
         'https://shallowdream204-bitdance-14b-64x.hf.space',
         'https://black-forest-labs-flux-1-schnell.hf.space',
-        'https://stabilityai-stable-diffusion-3-medium.hf.space'
+        'https://kingnish-realvisxl-v4-0.hf.space' // Замена упавшей SD 3.0 на рабочую XL
     ];
 
     const frame = document.getElementById('ai-frame');
-    const statusText = document.getElementById('status');
 
     function changeModel(index) {
-        // Меняем URL фрейма
+        // Показываем загрузку
+        document.getElementById('status-dot').style.background = '#ffcc00';
+        document.getElementById('status-dot').style.boxShadow = '0 0 8px #ffcc00';
+
         frame.src = models[index];
         
-        // Визуально подсвечиваем активную кнопку
+        // Подсветка кнопок
         document.querySelectorAll('.nav button').forEach((btn, i) => {
             btn.classList.toggle('active', i === index);
         });
-        
-        statusText.innerText = `Сервер: #${index + 1} активен`;
+
+        // Через 2 секунды возвращаем зеленый цвет (типо загрузилось)
+        setTimeout(() => {
+            document.getElementById('status-dot').style.background = '#00ff88';
+            document.getElementById('status-dot').style.boxShadow = '0 0 8px #00ff88';
+        }, 2000);
     }
 
-    // ЛОГИКА ДЛЯ ПРЕЗЕНТАЦИИ:
-    // При загрузке страницы выбираем СЛУЧАЙНУЮ модель из списка
+    // БАЛАНСИРОВКА: при открытии сайта каждому выдается случайная модель
     window.onload = function() {
         const randomIndex = Math.floor(Math.random() * models.length);
         changeModel(randomIndex);
-        console.log("Авто-балансировка: выбрана модель №" + (randomIndex + 1));
     };
 </script>
 
