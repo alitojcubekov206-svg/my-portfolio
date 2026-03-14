@@ -3,92 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIdent2 Gen — Stable Multi AI</title>
+    <title>AIdent2 Gen — AI Portfolio</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background: #050505; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        
-        /* Навигация */
-        .nav { 
-            height: 60px; background: #111; display: flex; align-items: center; justify-content: center; 
-            gap: 10px; border-bottom: 1px solid #333; padding: 0 20px;
-        }
-        .nav span { color: #888; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-right: 5px; }
-        
+        body, html { margin: 0; padding: 0; height: 100%; background: #0b0b0b; color: white; font-family: sans-serif; overflow: hidden; }
+        .nav { height: 60px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; gap: 10px; border-bottom: 2px solid #333; }
         .nav button { 
-            background: #1a1a1a; border: 1px solid #444; color: #ddd; 
-            padding: 8px 16px; border-radius: 6px; cursor: pointer; 
-            font-size: 14px; transition: all 0.2s;
+            background: #222; border: 1px solid #444; color: #ccc; padding: 8px 15px; 
+            border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.3s;
         }
-        .nav button:hover { background: #2a2a2a; border-color: #00d2ff; color: #fff; }
-        .nav button.active { 
-            background: #00d2ff; color: #000; border-color: #00d2ff; font-weight: bold; 
-            box-shadow: 0 0 10px rgba(0, 210, 255, 0.4);
+        .nav button:hover { background: #333; border-color: #00d2ff; }
+        .nav button.active { background: #00d2ff; color: #000; border-color: #00d2ff; }
+        
+        /* Контейнер для фрейма */
+        .container { width: 100%; height: calc(100vh - 60px); position: relative; background: #0b0b0b; }
+        iframe { width: 100%; height: 100%; border: none; }
+
+        /* Сообщение-подсказка */
+        #loader-hint {
+            position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.7); padding: 5px 15px; border-radius: 20px;
+            font-size: 12px; color: #00ff88; z-index: 10; pointer-events: none;
         }
-
-        /* Iframe на весь экран */
-        iframe { width: 100%; height: calc(100vh - 60px); border: none; background: #000; }
-
-        /* Индикатор статуса */
-        #status { margin-left: 15px; font-size: 12px; color: #00ff88; font-family: monospace; }
-        #status.error { color: #ff4444; }
     </style>
 </head>
 <body>
 
 <div class="nav">
-    <span>AI Движки:</span>
-    <!-- Кнопки привязаны к индексам 0, 1, 2 -->
-    <button id="btn-0" onclick="selectModel(0)">BitDance 14B</button>
-    <button id="btn-1" onclick="selectModel(1)">Flux Schnell (Fast)</button>
-    <button id="btn-2" onclick="selectModel(2)">SDXL Lightning</button>
-    
-    <div id="status">● Система готова</div>
+    <button id="btn-0" onclick="changeModel(0)">BitDance (Stable)</button>
+    <button id="btn-1" onclick="changeModel(1)">Flux Fast</button>
+    <button id="btn-2" onclick="changeModel(2)">Magic Gen (SDXL)</button>
 </div>
 
-<!-- Iframe загружается динамически -->
-<iframe id="ai-frame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
+<div class="container">
+    <div id="loader-hint">Подключение к серверу...</div>
+    <iframe id="ai-frame" 
+        src="about:blank" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+        sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-today-data-delivery-format-allow-downloads">
+    </iframe>
+</div>
 
 <script>
-    // === СПИСОК РАБОЧИХ ССЫЛОК (ПРОВЕРЕНО) ===
+    // Самые стабильные зеркала на текущий момент
     const models = [
-        'https://shallowdream204-bitdance-14b-64x.hf.space',       // 1. Твоя рабочая
-        'https://multimodalart-flux-1-schnell.hf.space',           // 2. Замена Flux (Клон)
-        'https://freepreset-sdxl-lightning.hf.space'               // 3. Замена SD3 (Быстрая SDXL)
+        'https://shallowdream204-bitdance-14b-64x.hf.space',
+        'https://black-forest-labs-flux-1-schnell.hf.space',
+        'https://prodia-fast-stable-diffusion.hf.space' // Очень живучий эндпоинт
     ];
 
     const frame = document.getElementById('ai-frame');
-    const statusDiv = document.getElementById('status');
-    const buttons = document.querySelectorAll('.nav button');
+    const hint = document.getElementById('loader-hint');
 
-    function selectModel(index) {
-        // 1. Визуально переключаем кнопки
-        buttons.forEach((btn, i) => {
+    function changeModel(index) {
+        hint.style.display = 'block';
+        hint.innerText = "Запуск модели " + (index + 1) + "... подождите";
+        
+        frame.src = models[index];
+        
+        document.querySelectorAll('.nav button').forEach((btn, i) => {
             btn.classList.toggle('active', i === index);
         });
 
-        // 2. Меняем статус
-        statusDiv.textContent = "● Загрузка модели...";
-        statusDiv.className = "";
-
-        // 3. Подменяем ссылку в iframe
-        // Добавляем случайное число, чтобы браузер не кэшировал старую ошибку
-        frame.src = models[index] + "?t=" + new Date().getTime();
-
-        // 4. Имитация успешной загрузки (так как мы не можем читать чужой iframe из-за безопасности браузера)
-        setTimeout(() => {
-            statusDiv.textContent = "● Модель активна: " + (index === 0 ? "BitDance" : (index === 1 ? "Flux" : "SDXL"));
-        }, 2000);
+        // Скрываем подсказку через 5 секунд
+        setTimeout(() => { hint.style.display = 'none'; }, 5000);
     }
 
-    // === АВТОМАТИЧЕСКИЙ СТАРТ ===
+    // Рандомный выбор при входе для распределения 40 человек
     window.onload = function() {
-        // Выбираем случайную модель при входе, чтобы распределить 40 человек
         const randomIndex = Math.floor(Math.random() * models.length);
-        selectModel(randomIndex);
-        
-        console.log("Презентация готова. Выбрана модель №" + (randomIndex + 1));
+        changeModel(randomIndex);
     };
 </script>
 
 </body>
-</html>
+</html> 
